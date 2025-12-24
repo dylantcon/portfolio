@@ -1,0 +1,12 @@
+{
+  "viewport_size": 15,
+  "player_char": "$",
+  "player_color": "#00ff00",
+  "move_delay_ms": 100,
+  "theme": {
+    "background": "#0a0a0a",
+    "text": "#e0e0e0",
+    "accent": "#00ff00",
+    "error": "#ff4444"
+  }
+}

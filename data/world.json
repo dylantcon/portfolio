@@ -1,0 +1,22 @@
+{
+  "chunk_size": 50,
+  "spawn_chunk": [0, 0],
+  "spawn_local": [25, 25],
+  "tile_definitions": {
+    "~": {"char": "~", "color": "#4da6ff", "type": "water", "walkable": false},
+    "^": {"char": "^", "color": "#90ee90", "type": "grass", "walkable": true},
+    ".": {"char": ".", "color": "#f4a460", "type": "sand", "walkable": true},
+    "#": {"char": "#", "color": "#808080", "type": "building", "walkable": false},
+    "T": {"char": "T", "color": "#228b22", "type": "tree", "walkable": false},
+    "+": {"char": "+", "color": "#8b4513", "type": "path", "walkable": true},
+    "*": {"char": "*", "color": "#ffff00", "type": "star", "walkable": true},
+    "@": {"char": "@", "color": "#ff6b6b", "type": "marker", "walkable": true},
+    " ": {"char": " ", "color": "#1a1a1a", "type": "empty", "walkable": true}
+  },
+  "chunks": {
+    "0,0": {
+      "name": "Starting Island",
+      "file": "chunks/0_0.json"
+    }
+  }
+}

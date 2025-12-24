@@ -1,0 +1,24 @@
+{
+  "projects": [
+    {
+      "id": "ascii-portfolio",
+      "title": "ASCII Adventure Portfolio",
+      "description": "A unique terminal-style portfolio website built with Go and vanilla JavaScript. Features an interactive ASCII adventure game for exploring projects.",
+      "tech_stack": ["Go", "JavaScript", "NGINX", "Linux"],
+      "github_url": "https://github.com/dylantcon/portfolio",
+      "live_url": "https://dconn.dev",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "placeholder-project",
+      "title": "Your Project Here",
+      "description": "This is a placeholder for your future projects. Edit data/projects.json to add your own portfolio items!",
+      "tech_stack": ["Technology", "Stack", "Here"],
+      "github_url": "",
+      "live_url": "",
+      "year": 2025,
+      "featured": false
+    }
+  ]
+}
