@@ -1,0 +1,27 @@
+[Unit]
+Description=dconn.dev Go Application - ASCII Adventure Portfolio
+After=network.target
+
+[Service]
+Type=simple
+User=webdev_dojo
+Group=www-data
+WorkingDirectory=/var/www/dconn.dev
+ExecStart=/var/www/dconn.dev/bin/server
+Restart=on-failure
+RestartSec=5s
+
+# Environment
+Environment="GO_ENV=production"
+Environment="SERVER_ADDR=:8080"
+
+# Logging
+StandardOutput=append:/var/www/dconn.dev/logs/app.log
+StandardError=append:/var/www/dconn.dev/logs/error.log
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
