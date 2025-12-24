@@ -1,9 +1,9 @@
 {
   "projects": [
     {
-      "id": "ascii-portfolio",
+      "id": "portfolio",
       "title": "ASCII Adventure Portfolio",
-      "description": "A unique terminal-style portfolio website built with Go and vanilla JavaScript. Features an interactive ASCII adventure game for exploring projects.",
+      "description": "A terminal-style portfolio website with an interactive ASCII adventure game. Explore a Zelda-inspired overworld to discover projects.",
       "tech_stack": ["Go", "JavaScript", "NGINX", "Linux"],
       "github_url": "https://github.com/dylantcon/portfolio",
       "live_url": "https://dconn.dev",
@@ -11,11 +11,111 @@
       "featured": true
     },
     {
-      "id": "placeholder-project",
-      "title": "Your Project Here",
-      "description": "This is a placeholder for your future projects. Edit data/projects.json to add your own portfolio items!",
-      "tech_stack": ["Technology", "Stack", "Here"],
-      "github_url": "",
+      "id": "clinicore",
+      "title": "CliniCore",
+      "description": "Electronic medical records and practice management platform. Features patient management, clinical documentation, appointment scheduling, and prescription tracking.",
+      "tech_stack": ["C#", "ASP.NET Core", "Entity Framework", "SQL Server", ".NET MAUI"],
+      "github_url": "https://github.com/dylantcon/clinicore",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "compiler-project",
+      "title": "Lisp Compiler",
+      "description": "Full compiler for a Lisp-esque language. Implements lexing, parsing, AST generation, control flow graph/IR generation, and optimizations.",
+      "tech_stack": ["C"],
+      "github_url": "https://github.com/dylantcon/compiler-project",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "arithmetic-rdp",
+      "title": "Arithmetic Parser",
+      "description": "Recursive descent parser for arithmetic expressions. Demonstrates fundamental parsing techniques and expression evaluation.",
+      "tech_stack": ["C"],
+      "github_url": "https://github.com/dylantcon/arithmetic-rdp-c",
+      "live_url": "",
+      "year": 2025,
+      "featured": false
+    },
+    {
+      "id": "pydis",
+      "title": "PyDis",
+      "description": "Python bytecode disassembler and side-by-side execution visualizer. Features debugging, variable inspection, and I/O tracing.",
+      "tech_stack": ["Python"],
+      "github_url": "https://github.com/dylantcon/pydis",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "countertrak",
+      "title": "CounterTrak",
+      "description": "Lightweight Counter-Strike 2 statistics tracker web application. Track your performance and analyze your gameplay.",
+      "tech_stack": ["Python", "Flask", "SQLite"],
+      "github_url": "https://github.com/dylantcon/countertrak",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "javarominoes",
+      "title": "Javarominoes",
+      "description": "Tetris-inspired block stacking puzzle game built with Java Swing. Dedicated to Granddad.",
+      "tech_stack": ["Java", "Swing"],
+      "github_url": "https://github.com/dylantcon/javarominoes",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "seas-of-yore",
+      "title": "Seas of Yore",
+      "description": "Medieval Battleship-inspired board game with custom-drawn sprites, new features, and engaging game modes.",
+      "tech_stack": ["Java", "Swing"],
+      "github_url": "https://github.com/dylantcon/seas-of-yore",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "presentation-choreographer",
+      "title": "Presentation Choreographer",
+      "description": "Programmatic creation and manipulation of PowerPoint files. Powered by Java and the Anthropic API.",
+      "tech_stack": ["Java", "Anthropic API"],
+      "github_url": "https://github.com/dylantcon/presentation-choreographer",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "learn-dconn-dev",
+      "title": "Learn @ dconn.dev",
+      "description": "Teaching materials for an extracurricular programming course for students ages 12-16. Static educational content.",
+      "tech_stack": ["HTML", "CSS", "JavaScript"],
+      "github_url": "https://github.com/dylantcon/learn-dconn-dev",
+      "live_url": "",
+      "year": 2025,
+      "featured": true
+    },
+    {
+      "id": "draw-shapes",
+      "title": "Draw Shapes",
+      "description": "Lightweight drawing program with multiple drawing modes, colors, brush sizes, undo functionality, and save/load capabilities.",
+      "tech_stack": ["Java", "Swing"],
+      "github_url": "https://github.com/dylantcon/draw-shapes",
+      "live_url": "",
+      "year": 2025,
+      "featured": false
+    },
+    {
+      "id": "site-selector",
+      "title": "Site Selector",
+      "description": "Lightweight web browser built in Java. Minimal and functional.",
+      "tech_stack": ["Java", "Swing"],
+      "github_url": "https://github.com/dylantcon/site-selector",
       "live_url": "",
       "year": 2025,
       "featured": false

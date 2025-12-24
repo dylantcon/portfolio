@@ -4,19 +4,56 @@
   "spawn_local": [25, 25],
   "tile_definitions": {
     "~": {"char": "~", "color": "#4da6ff", "type": "water", "walkable": false},
+    "≈": {"char": "≈", "color": "#2d7db3", "type": "deep_water", "walkable": false},
     "^": {"char": "^", "color": "#90ee90", "type": "grass", "walkable": true},
     ".": {"char": ".", "color": "#f4a460", "type": "sand", "walkable": true},
     "#": {"char": "#", "color": "#808080", "type": "building", "walkable": false},
+    "B": {"char": "#", "color": "#f5f5f5", "type": "white_building", "walkable": false},
     "T": {"char": "T", "color": "#228b22", "type": "tree", "walkable": false},
+    "t": {"char": "t", "color": "#2d5a1d", "type": "pine_tree", "walkable": false},
     "+": {"char": "+", "color": "#8b4513", "type": "path", "walkable": true},
     "*": {"char": "*", "color": "#ffff00", "type": "star", "walkable": true},
     "@": {"char": "@", "color": "#ff6b6b", "type": "marker", "walkable": true},
-    " ": {"char": " ", "color": "#1a1a1a", "type": "empty", "walkable": true}
+    " ": {"char": " ", "color": "#1a1a1a", "type": "empty", "walkable": true},
+    "M": {"char": "M", "color": "#696969", "type": "mountain", "walkable": false},
+    "A": {"char": "A", "color": "#a9a9a9", "type": "peak", "walkable": false},
+    "s": {"char": "s", "color": "#fffafa", "type": "snow", "walkable": true},
+    "=": {"char": "=", "color": "#8b7355", "type": "dock", "walkable": true},
+    "o": {"char": "o", "color": "#778899", "type": "cobblestone", "walkable": true},
+    ";": {"char": ";", "color": "#3cb371", "type": "bush", "walkable": false},
+    "|": {"char": "|", "color": "#dcdcdc", "type": "pillar", "walkable": false},
+    "n": {"char": "n", "color": "#cd853f", "type": "bridge", "walkable": true},
+    "W": {"char": "W", "color": "#4a3728", "type": "wood_wall", "walkable": false},
+    "D": {"char": "D", "color": "#8b0000", "type": "door", "walkable": true}
   },
   "chunks": {
     "0,0": {
-      "name": "Starting Island",
+      "name": "Starting Isle",
       "file": "chunks/0_0.json"
+    },
+    "-1,-1": {
+      "name": "Compiler Peaks",
+      "file": "chunks/-1_-1.json"
+    },
+    "-1,0": {
+      "name": "Tool Workshop",
+      "file": "chunks/-1_0.json"
+    },
+    "1,0": {
+      "name": "Port Silicon",
+      "file": "chunks/1_0.json"
+    },
+    "-1,1": {
+      "name": "The Academy",
+      "file": "chunks/-1_1.json"
+    },
+    "0,1": {
+      "name": "Game Castle",
+      "file": "chunks/0_1.json"
+    },
+    "1,1": {
+      "name": "Medical Tower",
+      "file": "chunks/1_1.json"
     }
   }
 }
