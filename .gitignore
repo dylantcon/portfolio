@@ -1,0 +1,17 @@
+# build artifacts
+bin/
+*.exe
+
+# logs
+*.log
+
+# ide/editor/tooling
+.claude/
+.vscode/
+.idea./
+*.swp
+*.swo
+
+# os files
+.DS_Store
+Thumbs.db
