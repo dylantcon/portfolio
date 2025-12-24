@@ -1,5 +1,76 @@
 import { API } from './api.js?v=7';
 
+// FogOfWar handles visibility and exploration tracking
+class FogOfWar {
+    constructor() {
+        this.explored = new Set();  // "x,y" -> tiles player has seen
+        this.visible = new Set();   // Currently visible tiles
+        this.visionRadius = 15;     // How far the player can see
+    }
+
+    // Check if tile has been explored
+    isExplored(x, y) {
+        return this.explored.has(`${x},${y}`);
+    }
+
+    // Check if tile is currently visible
+    isVisible(x, y) {
+        return this.visible.has(`${x},${y}`);
+    }
+
+    // Calculate visibility using raycasting
+    calculateVisibility(playerX, playerY, isOpaque) {
+        this.visible.clear();
+
+        // Always see the player's tile
+        this.visible.add(`${playerX},${playerY}`);
+        this.explored.add(`${playerX},${playerY}`);
+
+        // Cast rays in all directions
+        const numRays = 360;
+        for (let i = 0; i < numRays; i++) {
+            const angle = (i / numRays) * 2 * Math.PI;
+            this.castRay(playerX, playerY, angle, isOpaque);
+        }
+    }
+
+    castRay(startX, startY, angle, isOpaque) {
+        const dx = Math.cos(angle);
+        const dy = Math.sin(angle);
+
+        let x = startX + 0.5;
+        let y = startY + 0.5;
+
+        for (let dist = 0; dist <= this.visionRadius; dist++) {
+            const tileX = Math.floor(x);
+            const tileY = Math.floor(y);
+            const key = `${tileX},${tileY}`;
+
+            // Mark as visible and explored
+            this.visible.add(key);
+            this.explored.add(key);
+
+            // Stop ray if tile blocks vision
+            if (isOpaque(tileX, tileY)) {
+                break;
+            }
+
+            x += dx * 0.5;
+            y += dy * 0.5;
+        }
+    }
+
+    // Get visibility state for rendering
+    getVisibilityState(x, y) {
+        if (this.isVisible(x, y)) {
+            return 'visible';
+        } else if (this.isExplored(x, y)) {
+            return 'explored';
+        }
+        return 'hidden';
+    }
+}
+
 // ChunkManager handles loading, caching, and accessing chunk-based map data
 class ChunkManager {
     constructor(api) {
@@ -182,6 +253,39 @@ class ChunkManager {
         const tileDef = this.world.tile_definitions[char];
         return tileDef?.type || 'unknown';
     }
+
+    // Check if a tile blocks vision
+    isOpaque(worldX, worldY) {
+        const { chunkX, chunkY, localX, localY } = this.worldToChunk(worldX, worldY);
+        const key = `${chunkX},${chunkY}`;
+
+        // Non-existent chunks don't block vision (water)
+        if (!this.chunkExists(chunkX, chunkY)) {
+            return false;
+        }
+
+        // Unloaded chunks block vision
+        if (!this.chunks.has(key)) {
+            return true;
+        }
+
+        const chunk = this.chunks.get(key);
+        const char = chunk.tiles[localY]?.[localX];
+
+        if (!char) return true;
+
+        // Tiles that block vision
+        const opaqueTiles = new Set([
+            '#',  // walls
+            'B',  // brick walls
+            'W',  // wood walls
+            'M',  // mountain peaks
+            'A',  // mountain base
+            'T',  // large trees
+        ]);
+
+        return opaqueTiles.has(char);
+    }
 }
 
 // Main Game class
@@ -189,6 +293,7 @@ class Game {
     constructor() {
         this.api = new API();
         this.chunkManager = new ChunkManager(this.api);
+        this.fogOfWar = new FogOfWar();
         this.viewport = document.getElementById('viewport');
         this.position = { x: 0, y: 0 };
         this.viewportWidth = 40;
@@ -198,6 +303,10 @@ class Game {
         this.keysDown = new Set();
         this.moveInterval = null;
         this.moveDelay = 120;
+
+        // Fog of war colors
+        this.hiddenColor = '#1a1a1a';
+        this.exploredDim = 0.4;  // Brightness multiplier for explored tiles
     }
 
     async init() {
@@ -295,6 +404,72 @@ class Game {
                 this.moveInterval = null;
             }
         });
+
+        // Mobile controls
+        this.setupMobileControls();
+    }
+
+    setupMobileControls() {
+        const dpadButtons = document.querySelectorAll('.dpad-btn[data-dir]');
+        const inspectBtn = document.getElementById('inspect-btn');
+
+        // Direction mapping
+        const dirMap = {
+            'up': 'arrowup',
+            'down': 'arrowdown',
+            'left': 'arrowleft',
+            'right': 'arrowright'
+        };
+
+        dpadButtons.forEach(btn => {
+            const dir = btn.dataset.dir;
+            const key = dirMap[dir];
+
+            // Handle touch start - begin movement
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.handleMove(key);
+
+                // Start repeat movement after delay
+                this.touchMoveTimeout = setTimeout(() => {
+                    this.touchMoveInterval = setInterval(() => {
+                        this.handleMove(key);
+                    }, this.moveDelay);
+                }, 200);
+            }, { passive: false });
+
+            // Handle touch end - stop movement
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                clearTimeout(this.touchMoveTimeout);
+                clearInterval(this.touchMoveInterval);
+            }, { passive: false });
+
+            // Handle touch cancel
+            btn.addEventListener('touchcancel', (e) => {
+                clearTimeout(this.touchMoveTimeout);
+                clearInterval(this.touchMoveInterval);
+            });
+
+            // Also support mouse clicks for testing
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleMove(key);
+            });
+        });
+
+        // Inspect button
+        if (inspectBtn) {
+            inspectBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                this.handleInspect();
+            }, { passive: false });
+
+            inspectBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleInspect();
+            });
+        }
     }
 
     processHeldKeys() {
@@ -332,6 +507,13 @@ class Game {
         const halfW = Math.floor(this.viewportWidth / 2);
         const halfH = Math.floor(this.viewportHeight / 2);
 
+        // Calculate visibility from player position
+        this.fogOfWar.calculateVisibility(
+            this.position.x,
+            this.position.y,
+            (x, y) => this.chunkManager.isOpaque(x, y)
+        );
+
         const rows = [];
 
         for (let vy = 0; vy < this.viewportHeight; vy++) {
@@ -343,14 +525,43 @@ class Game {
                 if (vx === halfW && vy === halfH) {
                     row += '<span style="color:#00ffff;font-weight:bold">$</span>';
                 } else {
-                    const tile = this.chunkManager.getTile(mapX, mapY);
-                    row += `<span style="color:${tile.color}">${tile.char}</span>`;
+                    const visibility = this.fogOfWar.getVisibilityState(mapX, mapY);
+
+                    if (visibility === 'hidden') {
+                        // Unexplored - show fog
+                        row += `<span style="color:${this.hiddenColor}">░</span>`;
+                    } else {
+                        const tile = this.chunkManager.getTile(mapX, mapY);
+                        if (visibility === 'explored') {
+                            // Explored but not visible - dim the color
+                            const dimColor = this.dimColor(tile.color, this.exploredDim);
+                            row += `<span style="color:${dimColor}">${tile.char}</span>`;
+                        } else {
+                            // Fully visible
+                            row += `<span style="color:${tile.color}">${tile.char}</span>`;
+                        }
+                    }
                 }
             }
             rows.push(row);
         }
 
         this.viewport.innerHTML = `<div class="viewport-content">${rows.join('\n')}</div>`;
+    }
+
+    // Dim a hex color by a multiplier (0-1)
+    dimColor(hexColor, multiplier) {
+        // Handle shorthand and full hex colors
+        let hex = hexColor.replace('#', '');
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+
+        const r = Math.floor(parseInt(hex.substr(0, 2), 16) * multiplier);
+        const g = Math.floor(parseInt(hex.substr(2, 2), 16) * multiplier);
+        const b = Math.floor(parseInt(hex.substr(4, 2), 16) * multiplier);
+
+        return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     }
 
     updateZoneInfo() {

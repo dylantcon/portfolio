@@ -24,7 +24,10 @@
     "|": {"char": "|", "color": "#dcdcdc", "type": "pillar", "walkable": false},
     "n": {"char": "n", "color": "#cd853f", "type": "bridge", "walkable": true},
     "W": {"char": "W", "color": "#4a3728", "type": "wood_wall", "walkable": false},
-    "D": {"char": "D", "color": "#8b0000", "type": "door", "walkable": true}
+    "D": {"char": "D", "color": "#8b0000", "type": "door", "walkable": true},
+    "%": {"char": "%", "color": "#4a90a4", "type": "window", "walkable": false},
+    "░": {"char": "░", "color": "#5c4033", "type": "wood_floor", "walkable": true},
+    "H": {"char": "H", "color": "#654321", "type": "chimney", "walkable": false}
   },
   "chunks": {
     "0,0": {

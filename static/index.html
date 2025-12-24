@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dylan Connolly</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=5">
+    <link rel="stylesheet" href="/static/css/style.css?v=6">
 </head>
 <body>
     <div class="container">
@@ -34,7 +34,16 @@
             <div class="game-wrapper">
                 <div id="viewport" class="viewport"></div>
                 <div class="controls">
-                    <p>WASD or Arrow Keys to move | E to inspect</p>
+                    <p class="desktop-hint">WASD or Arrow Keys to move | E to inspect</p>
+                    <div class="mobile-controls" id="mobile-controls">
+                        <div class="dpad">
+                            <button class="dpad-btn dpad-up" data-dir="up" aria-label="Move up">▲</button>
+                            <button class="dpad-btn dpad-left" data-dir="left" aria-label="Move left">◀</button>
+                            <button class="dpad-btn dpad-center" id="inspect-btn" aria-label="Inspect">E</button>
+                            <button class="dpad-btn dpad-right" data-dir="right" aria-label="Move right">▶</button>
+                            <button class="dpad-btn dpad-down" data-dir="down" aria-label="Move down">▼</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -52,6 +61,6 @@
         </footer>
     </div>
 
-    <script type="module" src="/static/js/game.js?v=7"></script>
+    <script type="module" src="/static/js/game.js?v=10"></script>
 </body>
 </html>
