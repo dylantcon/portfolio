@@ -308,28 +308,47 @@ func (cg *ChunkGenerator) placeHub() {
 	// If we have multiple connections or projects, add a central hub
 	if len(cg.config.Connections) > 1 || len(cg.config.Projects) > 0 {
 		center := Point{ChunkSize / 2, ChunkSize / 2}
-		plaza := NewPlaza(center, 3, "square")
-		cg.components = append(cg.components, plaza)
 
-		hubNode := &Node{
-			ID:       "hub",
-			Type:     NodeHub,
-			Position: center,
-			Anchors:  plaza.GetAnchors(),
-			Bounds:   plaza.GetBounds(),
+		// Check if a project component already occupies the center
+		var hubNodeID string
+		for _, comp := range cg.components {
+			if comp.GetBounds().Contains(center) {
+				// Use this project as the hub node for routing
+				if zone := comp.GetZone(); zone != nil && zone.ProjectID != "" {
+					hubNodeID = fmt.Sprintf("project_%s", zone.ProjectID)
+				}
+				break
+			}
 		}
-		cg.graph.AddNode(hubNode)
 
-		// Connect hub to all edge ports
+		// If center is free, create plaza and hub node
+		if hubNodeID == "" {
+			plaza := NewPlaza(center, 3, "square")
+			cg.components = append(cg.components, plaza)
+
+			hubNode := &Node{
+				ID:       "hub",
+				Type:     NodeHub,
+				Position: center,
+				Anchors:  plaza.GetAnchors(),
+				Bounds:   plaza.GetBounds(),
+			}
+			cg.graph.AddNode(hubNode)
+			hubNodeID = "hub"
+		}
+
+		// Connect hub (or occupying project) to all edge ports
 		for _, dir := range cg.config.Connections {
 			portID := fmt.Sprintf("port_%d", dir)
-			cg.graph.AddEdge("hub", portID, true)
+			cg.graph.AddEdge(hubNodeID, portID, true)
 		}
 
-		// Connect hub to all project nodes
+		// Connect hub to other project nodes (skip self-connection)
 		for _, proj := range cg.config.Projects {
 			projID := fmt.Sprintf("project_%s", proj.ProjectID)
-			cg.graph.AddEdge("hub", projID, true)
+			if projID != hubNodeID {
+				cg.graph.AddEdge(hubNodeID, projID, true)
+			}
 		}
 	} else if len(cg.config.Connections) == 1 {
 		// Single connection - just mark path from edge to interior

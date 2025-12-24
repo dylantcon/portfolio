@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 :root {
     --bg-color: #0c0c0c;
     --text-color: #cccccc;
@@ -14,7 +16,7 @@
 }
 
 body {
-    font-family: 'Lucida Console', 'Consolas', 'Monaco', monospace;
+    font-family: 'Lucida Console', 'Consolas', 'Monaco', 'Roboto Mono', monospace;
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.5;
@@ -91,7 +93,7 @@ body {
     line-height: 1.15;
     letter-spacing: 0;
     white-space: pre;
-    font-family: 'Lucida Console', 'Consolas', 'Monaco', monospace;
+    font-family: 'Lucida Console', 'Consolas', 'Monaco', 'Roboto Mono', monospace;
     overflow: hidden;
     height: calc(100vh - 220px);
     min-height: 250px;

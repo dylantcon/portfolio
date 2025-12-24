@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-
+  "math/rand/v2"
 	"dconn.dev/internal/generation"
 )
+
+var minimum, maximum int = 10000, 99999
 
 // WorldConfig defines the entire world layout
 var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      0,
 		ChunkY:      0,
-		Seed:        12345,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeGrassland,
 		Shorelines:  []generation.Direction{},
 		Connections: []generation.Direction{generation.South, generation.East, generation.West},
@@ -36,7 +38,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      -1,
 		ChunkY:      -1,
-		Seed:        23456,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeMountain,
 		Shorelines:  []generation.Direction{generation.West, generation.North, generation.East},
 		Connections: []generation.Direction{generation.South},
@@ -63,7 +65,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      -1,
 		ChunkY:      0,
-		Seed:        34567,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeForest,
 		Shorelines:  []generation.Direction{generation.West},
 		Connections: []generation.Direction{generation.North, generation.South, generation.East},
@@ -92,7 +94,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      1,
 		ChunkY:      0,
-		Seed:        45678,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeCoastal,
 		Shorelines:  []generation.Direction{generation.East},
 		Connections: []generation.Direction{generation.West, generation.South},
@@ -113,7 +115,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      -1,
 		ChunkY:      1,
-		Seed:        56789,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeUrban,
 		Shorelines:  []generation.Direction{generation.West, generation.South},
 		Connections: []generation.Direction{generation.North, generation.East},
@@ -134,7 +136,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      0,
 		ChunkY:      1,
-		Seed:        67890,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeCastle,
 		Shorelines:  []generation.Direction{generation.South},
 		Connections: []generation.Direction{generation.North, generation.West, generation.East},
@@ -177,7 +179,7 @@ var worldConfig = []generation.ChunkConfig{
 	{
 		ChunkX:      1,
 		ChunkY:      1,
-		Seed:        78901,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeUrban,
 		Shorelines:  []generation.Direction{generation.East, generation.South},
 		Connections: []generation.Direction{generation.North, generation.West},

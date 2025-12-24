@@ -484,8 +484,11 @@ func (s *Shrine) Render(g *Grid, p *Palette) {
 	// Marker border
 	g.RectOutline(bounds, p.Marker, true)
 
-	// Star center
-	g.Set(s.center, p.Star, true)
+	// Stars at four corners of the inner cobblestone area
+	g.Set(Point{bounds.MinX + 1, bounds.MinY + 1}, p.Star, true)
+	g.Set(Point{bounds.MaxX - 1, bounds.MinY + 1}, p.Star, true)
+	g.Set(Point{bounds.MinX + 1, bounds.MaxY - 1}, p.Star, true)
+	g.Set(Point{bounds.MaxX - 1, bounds.MaxY - 1}, p.Star, true)
 }
 
 func (s *Shrine) GetBounds() Bounds {
