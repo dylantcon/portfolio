@@ -34,6 +34,10 @@
       "name": "Starting Isle",
       "file": "chunks/0_0.json"
     },
+    "0,-1": {
+      "name": "The Automaton Forge",
+      "file": "chunks/0_-1.json"
+    },
     "-1,-1": {
       "name": "Compiler Peaks",
       "file": "chunks/-1_-1.json"

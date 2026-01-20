@@ -19,8 +19,9 @@ var worldConfig = []generation.ChunkConfig{
 		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
 		Biome:       generation.BiomeGrassland,
 		Shorelines:  []generation.Direction{},
-		Connections: []generation.Direction{generation.South, generation.East, generation.West},
+		Connections: []generation.Direction{generation.North, generation.South, generation.East, generation.West},
 		SignpostHints: map[generation.Direction]string{
+			generation.North: "Clockwork echoes drift from the north. The machines await.",
 			generation.South: "Castle spires glimmer in the distance.",
 			generation.East:  "The smell of salt and sea beckons.",
 			generation.West:  "Shadows dance between ancient trees, and mountains loom beyond.",
@@ -31,6 +32,26 @@ var worldConfig = []generation.ChunkConfig{
 				Name:        "Portfolio Shrine",
 				Description: "A mystical monument that seems to reflect your very presence. How... recursive.",
 				Structure:   "shrine",
+				Size:        2,
+			},
+		},
+	},
+	{
+		ChunkX:      0,
+		ChunkY:      -1,
+		Seed:        uint64(rand.IntN(maximum-minimum+1) + minimum),
+		Biome:       generation.BiomeUrban,
+		Shorelines:  []generation.Direction{generation.North},
+		Connections: []generation.Direction{generation.South},
+		SignpostHints: map[generation.Direction]string{
+			generation.South: "The peaceful starting meadows lie beyond.",
+		},
+		Projects: []generation.ProjectPlacement{
+			{
+				ProjectID:   "sysconf",
+				Name:        "The Automaton Forge",
+				Description: "Gears turn in perfect synchrony, each cog knowing its place. The machines here tend to themselves, an endless dance of configuration.",
+				Structure:   "building",
 				Size:        2,
 			},
 		},

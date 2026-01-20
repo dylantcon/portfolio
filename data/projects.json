@@ -119,6 +119,16 @@
       "live_url": "",
       "year": 2025,
       "featured": false
+    },
+    {
+      "id": "sysconf",
+      "title": "Sysconf",
+      "description": "Idempotent Linux system configuration tool. Manages packages across distros (apt/pacman/dnf), deploys dotfiles via symlinks, hardens SSH and fail2ban, configures Tailscale VPN, deploys web applications with NGINX and Certbot, and auto-syncs dotfile changes via cron.",
+      "tech_stack": ["Python", "TOML", "Systemd", "NGINX", "Jinja2", "Certbot", "Tailscale", "Git", "Cron"],
+      "github_url": "https://github.com/dylantcon/sysconf",
+      "live_url": "",
+      "year": 2026,
+      "featured": true
     }
   ]
 }
