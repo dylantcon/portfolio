@@ -504,6 +504,94 @@ func (s *Shrine) GetAnchors() []Anchor {
 
 func (s *Shrine) GetZone() *Zone { return s.zone }
 
+// Archive creates a unique library/scriptorium structure
+type Archive struct {
+	center      Point
+	size        int
+	entranceDir Direction
+	zone        *Zone
+}
+
+func NewArchive(center Point, size int, entranceDir Direction, zone *Zone) *Archive {
+	return &Archive{center: center, size: size, entranceDir: entranceDir, zone: zone}
+}
+
+func (a *Archive) Render(g *Grid, p *Palette) {
+	bounds := a.GetBounds()
+
+	// White building walls for distinction
+	g.RectOutline(bounds, p.WhiteBuilding, false)
+
+	// Cobblestone floor
+	interior := Bounds{bounds.MinX + 1, bounds.MinY + 1, bounds.MaxX - 1, bounds.MaxY - 1}
+	g.Rect(interior, p.Cobblestone, true)
+
+	// Corner pillars
+	g.Set(Point{bounds.MinX, bounds.MinY}, p.Pillar, false)
+	g.Set(Point{bounds.MaxX, bounds.MinY}, p.Pillar, false)
+	g.Set(Point{bounds.MinX, bounds.MaxY}, p.Pillar, false)
+	g.Set(Point{bounds.MaxX, bounds.MaxY}, p.Pillar, false)
+
+	// Bookshelves along walls (windows represent book spines)
+	for x := bounds.MinX + 2; x <= bounds.MaxX-2; x++ {
+		if a.entranceDir != North {
+			g.Set(Point{x, bounds.MinY}, p.Window, false)
+		}
+		if a.entranceDir != South {
+			g.Set(Point{x, bounds.MaxY}, p.Window, false)
+		}
+	}
+	for y := bounds.MinY + 2; y <= bounds.MaxY-2; y++ {
+		if a.entranceDir != West {
+			g.Set(Point{bounds.MinX, y}, p.Window, false)
+		}
+		if a.entranceDir != East {
+			g.Set(Point{bounds.MaxX, y}, p.Window, false)
+		}
+	}
+
+	// Central lectern with star (the resume)
+	g.Set(a.center, p.Star, true)
+
+	// Small reading markers around center
+	if a.size >= 2 {
+		g.Set(Point{a.center.X - 1, a.center.Y}, p.Marker, true)
+		g.Set(Point{a.center.X + 1, a.center.Y}, p.Marker, true)
+	}
+
+	// Place door
+	doorPos := a.getDoorPosition()
+	g.Set(doorPos, p.Door, true)
+}
+
+func (a *Archive) getDoorPosition() Point {
+	bounds := a.GetBounds()
+	switch a.entranceDir {
+	case North:
+		return Point{a.center.X, bounds.MinY}
+	case South:
+		return Point{a.center.X, bounds.MaxY}
+	case East:
+		return Point{bounds.MaxX, a.center.Y}
+	case West:
+		return Point{bounds.MinX, a.center.Y}
+	}
+	return Point{a.center.X, bounds.MaxY}
+}
+
+func (a *Archive) GetBounds() Bounds {
+	return Bounds{a.center.X - a.size - 1, a.center.Y - a.size,
+		a.center.X + a.size + 1, a.center.Y + a.size}
+}
+
+func (a *Archive) GetAnchors() []Anchor {
+	door := a.getDoorPosition()
+	dx, dy := a.entranceDir.Delta()
+	return []Anchor{{Position: door.Add(dx, dy), Direction: a.entranceDir.Opposite()}}
+}
+
+func (a *Archive) GetZone() *Zone { return a.zone }
+
 // ---- Infrastructure Components ----
 
 // Plaza creates a cobblestone gathering area
@@ -817,6 +905,228 @@ func (r *Ruins) GetAnchors() []Anchor {
 	return []Anchor{{Position: Point{center.X, r.bounds.MaxY + 1}, Direction: North}}
 }
 func (r *Ruins) GetZone() *Zone { return nil }
+
+// River creates a meandering water feature that auto-bridges paths
+type River struct {
+	start     Point
+	end       Point
+	width     int
+	rng       *RNG
+	path      []Point    // Calculated river path
+	bridges   []Point    // Where bridges were placed
+	pathTiles map[Point]bool // Reference to existing path tiles
+}
+
+func NewRiver(start, end Point, width int, rng *RNG, pathTiles map[Point]bool) *River {
+	r := &River{
+		start:     start,
+		end:       end,
+		width:     width,
+		rng:       rng,
+		pathTiles: pathTiles,
+		bridges:   make([]Point, 0),
+	}
+	r.calculatePath()
+	return r
+}
+
+func (r *River) calculatePath() {
+	r.path = make([]Point, 0)
+
+	current := r.start
+	r.path = append(r.path, current)
+
+	// Momentum for meandering (tendency to continue in same direction)
+	var lastDx, lastDy int
+
+	maxSteps := 200 // Safety limit
+	steps := 0
+
+	for current.X != r.end.X || current.Y != r.end.Y {
+		steps++
+		if steps > maxSteps {
+			break
+		}
+
+		// Calculate direction toward end
+		dx := 0
+		dy := 0
+
+		if r.end.X > current.X {
+			dx = 1
+		} else if r.end.X < current.X {
+			dx = -1
+		}
+
+		if r.end.Y > current.Y {
+			dy = 1
+		} else if r.end.Y < current.Y {
+			dy = -1
+		}
+
+		// Add meandering - sometimes go perpendicular
+		if r.rng.Float64() < 0.3 {
+			// Meander perpendicular to main direction
+			if dx != 0 && dy == 0 {
+				// Moving horizontally, meander vertically
+				if r.rng.Float64() < 0.5 {
+					dy = 1
+				} else {
+					dy = -1
+				}
+				dx = 0
+			} else if dy != 0 && dx == 0 {
+				// Moving vertically, meander horizontally
+				if r.rng.Float64() < 0.5 {
+					dx = 1
+				} else {
+					dx = -1
+				}
+				dy = 0
+			}
+		}
+
+		// Apply momentum (tend to continue previous direction)
+		if r.rng.Float64() < 0.2 && (lastDx != 0 || lastDy != 0) {
+			dx = lastDx
+			dy = lastDy
+		}
+
+		// Move (prefer diagonal movement toward goal when far)
+		distToEnd := abs(r.end.X-current.X) + abs(r.end.Y-current.Y)
+		if distToEnd < 10 {
+			// Close to end, move directly
+			if abs(r.end.X-current.X) > abs(r.end.Y-current.Y) {
+				dy = 0
+			} else {
+				dx = 0
+			}
+		}
+
+		// Ensure we move
+		if dx == 0 && dy == 0 {
+			if abs(r.end.X-current.X) > 0 {
+				if r.end.X > current.X {
+					dx = 1
+				} else {
+					dx = -1
+				}
+			} else {
+				if r.end.Y > current.Y {
+					dy = 1
+				} else {
+					dy = -1
+				}
+			}
+		}
+
+		lastDx, lastDy = dx, dy
+		current = Point{current.X + dx, current.Y + dy}
+
+		// Bounds check
+		if current.X < 0 || current.X >= 50 || current.Y < 0 || current.Y >= 50 {
+			break
+		}
+
+		r.path = append(r.path, current)
+	}
+}
+
+func (r *River) Render(g *Grid, p *Palette) {
+	// Define structure tiles that rivers should never overwrite
+	structureTiles := map[string]bool{
+		p.Building:      true,
+		p.WhiteBuilding: true,
+		p.WoodWall:      true,
+		p.Door:          true,
+		p.Pillar:        true,
+		p.Cobblestone:   true,
+		p.Window:        true,
+		p.WoodFloor:     true,
+		p.Chimney:       true,
+		p.Star:          true,
+		p.Marker:        true,
+		p.Dock:          true,
+	}
+
+	// First pass: render water (only on safe tiles)
+	for _, pt := range r.path {
+		current := g.Get(pt)
+
+		// Skip structure tiles entirely
+		if structureTiles[current] {
+			continue
+		}
+
+		// Check if this crosses a path - if so, place bridge
+		if r.pathTiles[pt] {
+			g.Set(pt, p.Bridge, true)
+			r.bridges = append(r.bridges, pt)
+		} else {
+			g.Set(pt, p.Water, false)
+		}
+	}
+
+	// Add width (river banks) - only on natural terrain
+	if r.width > 1 {
+		for _, pt := range r.path {
+			for _, adj := range pt.Adjacent() {
+				if g.InBounds(adj) && !r.pathTiles[adj] {
+					current := g.Get(adj)
+					// Only place water on grass or sand
+					if current == p.Grass || current == p.Sand {
+						if r.rng.Float64() < 0.6 {
+							g.Set(adj, p.Water, false)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Add sand/shore along river edges (only on grass)
+	for _, pt := range r.path {
+		for _, adj := range pt.Adjacent() {
+			if g.InBounds(adj) {
+				current := g.Get(adj)
+				if current == p.Grass {
+					if r.rng.Float64() < 0.3 {
+						g.Set(adj, p.Sand, true)
+					}
+				}
+			}
+		}
+	}
+}
+
+func (r *River) GetBounds() Bounds {
+	if len(r.path) == 0 {
+		return Bounds{r.start.X, r.start.Y, r.end.X, r.end.Y}
+	}
+
+	minX, minY := r.path[0].X, r.path[0].Y
+	maxX, maxY := r.path[0].X, r.path[0].Y
+
+	for _, pt := range r.path {
+		if pt.X < minX {
+			minX = pt.X
+		}
+		if pt.X > maxX {
+			maxX = pt.X
+		}
+		if pt.Y < minY {
+			minY = pt.Y
+		}
+		if pt.Y > maxY {
+			maxY = pt.Y
+		}
+	}
+
+	return Bounds{minX, minY, maxX, maxY}
+}
+
+func (r *River) GetAnchors() []Anchor { return nil }
+func (r *River) GetZone() *Zone       { return nil }
 
 // Helper functions
 func min(a, b int) int {

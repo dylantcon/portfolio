@@ -1,4 +1,4 @@
-import { API } from './api.js?v=7';
+import { API } from './api.js?v=8';
 
 // FogOfWar handles visibility and exploration tracking
 class FogOfWar {
@@ -38,12 +38,14 @@ class FogOfWar {
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
 
-        let x = startX + 0.5;
-        let y = startY + 0.5;
+        // Start at tile center - no offset needed with round()
+        let x = startX;
+        let y = startY;
 
         for (let dist = 0; dist <= this.visionRadius; dist++) {
-            const tileX = Math.floor(x);
-            const tileY = Math.floor(y);
+            // Use round() for symmetric handling in all directions
+            const tileX = Math.round(x);
+            const tileY = Math.round(y);
             const key = `${tileX},${tileY}`;
 
             // Mark as visible and explored
@@ -142,16 +144,33 @@ class ChunkManager {
         }
     }
 
-    // Prefetch chunks around a position
-    prefetchAround(worldX, worldY) {
-        const { chunkX, chunkY } = this.worldToChunk(worldX, worldY);
+    // Prefetch chunks around a position - when player's LOS can reach the border
+    prefetchAround(worldX, worldY, visionRadius = 15) {
+        const { chunkX, chunkY, localX, localY } = this.worldToChunk(worldX, worldY);
+        // Load adjacent chunks when LOS can see into them
+        const threshold = visionRadius;
+        const maxLocal = this.chunkSize - 1 - threshold;
 
-        // Load 3x3 grid around current chunk
-        for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-                this.loadChunk(chunkX + dx, chunkY + dy);
-            }
-        }
+        // Always ensure current chunk is loaded
+        this.loadChunk(chunkX, chunkY);
+
+        // Check proximity to each edge and load adjacent chunks as needed
+        const nearWest = localX <= threshold;
+        const nearEast = localX >= maxLocal;
+        const nearNorth = localY <= threshold;
+        const nearSouth = localY >= maxLocal;
+
+        // Cardinal directions
+        if (nearWest) this.loadChunk(chunkX - 1, chunkY);
+        if (nearEast) this.loadChunk(chunkX + 1, chunkY);
+        if (nearNorth) this.loadChunk(chunkX, chunkY - 1);
+        if (nearSouth) this.loadChunk(chunkX, chunkY + 1);
+
+        // Diagonal chunks (only load when near a corner)
+        if (nearNorth && nearWest) this.loadChunk(chunkX - 1, chunkY - 1);
+        if (nearNorth && nearEast) this.loadChunk(chunkX + 1, chunkY - 1);
+        if (nearSouth && nearWest) this.loadChunk(chunkX - 1, chunkY + 1);
+        if (nearSouth && nearEast) this.loadChunk(chunkX + 1, chunkY + 1);
     }
 
     // Get tile at world coordinates
@@ -314,8 +333,8 @@ class Game {
             // Initialize chunk manager and get spawn position
             this.position = await this.chunkManager.init();
 
-            // Prefetch surrounding chunks
-            this.chunkManager.prefetchAround(this.position.x, this.position.y);
+            // Prefetch surrounding chunks based on vision radius
+            this.chunkManager.prefetchAround(this.position.x, this.position.y, this.fogOfWar.visionRadius);
 
             this.calculateViewportSize();
             this.render();
@@ -495,8 +514,8 @@ class Game {
             this.position.x = newX;
             this.position.y = newY;
 
-            // Prefetch chunks as player moves
-            this.chunkManager.prefetchAround(newX, newY);
+            // Prefetch chunks as player moves (based on vision radius)
+            this.chunkManager.prefetchAround(newX, newY, this.fogOfWar.visionRadius);
 
             this.render();
             this.updateZoneInfo();

@@ -54,6 +54,13 @@ var worldConfig = []generation.ChunkConfig{
 				Structure:   "building",
 				Size:        2,
 			},
+			{
+				ProjectID:   "dev-resume",
+				Name:        "The Creator's Archive",
+				Description: "The townspeople whisper that the creator himself once resided here. Within these walls, his deeds and knowledge are preserved for eternity.",
+				Structure:   "archive",
+				Size:        2,
+			},
 		},
 	},
 	{

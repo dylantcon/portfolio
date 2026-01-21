@@ -182,6 +182,11 @@ func (cg *ChunkGenerator) placeProjects() error {
 			entranceDir := cg.findBestEntrance(pos, size)
 			comp = NewCabin(bounds, entranceDir, zone)
 
+		case "archive":
+			size := 2 + proj.Size
+			entranceDir := cg.findBestEntrance(pos, size)
+			comp = NewArchive(pos, size, entranceDir, zone)
+
 		default: // "building"
 			size := 3 + proj.Size
 			bounds := Bounds{pos.X - size, pos.Y - size/2, pos.X + size, pos.Y + size/2}
@@ -308,11 +313,18 @@ func (cg *ChunkGenerator) placeHub() {
 	// If we have multiple connections or projects, add a central hub
 	if len(cg.config.Connections) > 1 || len(cg.config.Projects) > 0 {
 		center := Point{ChunkSize / 2, ChunkSize / 2}
+		plazaRadius := 3
+		plazaBounds := Bounds{
+			center.X - plazaRadius, center.Y - plazaRadius,
+			center.X + plazaRadius, center.Y + plazaRadius,
+		}
 
-		// Check if a project component already occupies the center
+		// Check if any project component overlaps with proposed plaza bounds
 		var hubNodeID string
 		for _, comp := range cg.components {
-			if comp.GetBounds().Contains(center) {
+			compBounds := comp.GetBounds()
+			// Check if bounds overlap
+			if plazaBounds.Overlaps(compBounds) {
 				// Use this project as the hub node for routing
 				if zone := comp.GetZone(); zone != nil && zone.ProjectID != "" {
 					hubNodeID = fmt.Sprintf("project_%s", zone.ProjectID)
@@ -321,9 +333,9 @@ func (cg *ChunkGenerator) placeHub() {
 			}
 		}
 
-		// If center is free, create plaza and hub node
+		// If plaza area is free, create plaza and hub node
 		if hubNodeID == "" {
-			plaza := NewPlaza(center, 3, "square")
+			plaza := NewPlaza(center, plazaRadius, "square")
 			cg.components = append(cg.components, plaza)
 
 			hubNode := &Node{
@@ -390,6 +402,9 @@ func (cg *ChunkGenerator) placeTerrainFeatures() {
 	// Add biome-specific terrain features in chunk interior
 	// These are placed AFTER paths are routed so they don't block connectivity
 
+	// Collect path tiles for river bridging
+	pathTiles := cg.collectPathTiles()
+
 	switch cg.config.Biome {
 	case BiomeGrassland:
 		// Add a pond in a corner
@@ -398,18 +413,43 @@ func (cg *ChunkGenerator) placeTerrainFeatures() {
 			pond := NewPond(pos, 3)
 			cg.terrainFeatures = append(cg.terrainFeatures, pond)
 		}
+		// Add a gentle brook
+		if cg.rng.Float64() < 0.6 {
+			// Stream flows from top-left area toward bottom-right
+			start := Point{5 + cg.rng.Intn(10), 3 + cg.rng.Intn(5)}
+			end := Point{40 + cg.rng.Intn(8), 45 + cg.rng.Intn(4)}
+			river := NewRiver(start, end, 1, cg.rng, pathTiles)
+			cg.terrainFeatures = append(cg.terrainFeatures, river)
+		}
 
 	case BiomeForest:
 		// Add dense grove areas in corners (away from paths)
 		grove1 := NewGrove(Bounds{5, 5, 12, 12}, 0.35, cg.palette.Tree, cg.rng)
 		grove2 := NewGrove(Bounds{38, 38, 45, 45}, 0.35, cg.palette.Tree, cg.rng)
 		cg.terrainFeatures = append(cg.terrainFeatures, grove1, grove2)
+		// Add a winding forest stream
+		start := Point{2 + cg.rng.Intn(5), 20 + cg.rng.Intn(10)}
+		end := Point{45 + cg.rng.Intn(4), 25 + cg.rng.Intn(15)}
+		river := NewRiver(start, end, 1, cg.rng, pathTiles)
+		cg.terrainFeatures = append(cg.terrainFeatures, river)
 
 	case BiomeCoastal:
 		// Add dock extending into water if we have east shoreline
 		for _, dir := range cg.config.Shorelines {
 			if dir == East {
-				dock := NewDock(Point{ChunkSize - 8, ChunkSize / 2}, East, 5, 3, nil)
+				dock := NewDock(Point{ChunkSize - 8, ChunkSize / 2}, East, 6, 3, nil)
+				cg.terrainFeatures = append(cg.terrainFeatures, dock)
+			}
+			if dir == South {
+				dock := NewDock(Point{ChunkSize / 2, ChunkSize - 8}, South, 6, 3, nil)
+				cg.terrainFeatures = append(cg.terrainFeatures, dock)
+			}
+			if dir == West {
+				dock := NewDock(Point{7, ChunkSize / 2}, West, 6, 3, nil)
+				cg.terrainFeatures = append(cg.terrainFeatures, dock)
+			}
+			if dir == North {
+				dock := NewDock(Point{ChunkSize / 2, 7}, North, 6, 3, nil)
 				cg.terrainFeatures = append(cg.terrainFeatures, dock)
 			}
 		}
@@ -423,12 +463,36 @@ func (cg *ChunkGenerator) placeTerrainFeatures() {
 		// Add ruins in a corner
 		ruins := NewRuins(Bounds{38, 5, 44, 10}, 0.4, cg.rng)
 		cg.terrainFeatures = append(cg.terrainFeatures, ruins)
+		// Add a stream/moat element
+		if cg.rng.Float64() < 0.5 {
+			start := Point{5, 15 + cg.rng.Intn(10)}
+			end := Point{45, 20 + cg.rng.Intn(15)}
+			river := NewRiver(start, end, 1, cg.rng, pathTiles)
+			cg.terrainFeatures = append(cg.terrainFeatures, river)
+		}
 
 	case BiomeMountain:
 		// Add a small pine grove in the lower portion
 		grove := NewGrove(Bounds{35, 38, 42, 45}, 0.2, cg.palette.PineTree, cg.rng)
 		cg.terrainFeatures = append(cg.terrainFeatures, grove)
+		// Add a mountain stream flowing from peaks southward
+		start := Point{15 + cg.rng.Intn(10), 15 + cg.rng.Intn(5)}
+		end := Point{20 + cg.rng.Intn(15), 47}
+		river := NewRiver(start, end, 1, cg.rng, pathTiles)
+		cg.terrainFeatures = append(cg.terrainFeatures, river)
 	}
+}
+
+func (cg *ChunkGenerator) collectPathTiles() map[Point]bool {
+	pathTiles := make(map[Point]bool)
+	for y := 0; y < ChunkSize; y++ {
+		for x := 0; x < ChunkSize; x++ {
+			if cg.grid.Get(Point{x, y}) == cg.palette.Path {
+				pathTiles[Point{x, y}] = true
+			}
+		}
+	}
+	return pathTiles
 }
 
 func (cg *ChunkGenerator) renderTerrainFeatures() {

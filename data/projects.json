@@ -129,6 +129,16 @@
       "live_url": "",
       "year": 2026,
       "featured": true
+    },
+    {
+      "id": "dev-resume",
+      "title": "Resume",
+      "description": "My professional resume, typeset with LaTeX for precise formatting and version-controlled for easy updates.",
+      "tech_stack": ["LaTeX", "PDF"],
+      "github_url": "https://github.com/dylantcon/dev-resume",
+      "live_url": "",
+      "year": 2026,
+      "featured": false
     }
   ]
 }
