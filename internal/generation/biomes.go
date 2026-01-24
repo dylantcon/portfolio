@@ -66,7 +66,7 @@ func DefaultPalette() *Palette {
 		Marker:        "@",
 		Empty:         " ",
 		Window:        "%",
-		WoodFloor:     "░",
+		WoodFloor:     "X",
 		Chimney:       "H",
 	}
 }

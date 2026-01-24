@@ -85,7 +85,7 @@ class ChunkManager {
         // Edge generation tiles
         this.waterTile = { char: '~', color: '#4da6ff' };
         this.sandTile = { char: '.', color: '#f4a460' };
-        this.fogTile = { char: '░', color: '#333333' };
+        this.fogTile = { char: '`', color: '#333333' };
     }
 
     async init() {
@@ -293,13 +293,10 @@ class ChunkManager {
 
         if (!char) return true;
 
-        // Tiles that block vision
+        // Tiles that block vision (walls and dense trees)
         const opaqueTiles = new Set([
             '#',  // walls
-            'B',  // brick walls
             'W',  // wood walls
-            'M',  // mountain peaks
-            'A',  // mountain base
             'T',  // large trees
         ]);
 
@@ -548,7 +545,7 @@ class Game {
 
                     if (visibility === 'hidden') {
                         // Unexplored - show fog
-                        row += `<span style="color:${this.hiddenColor}">░</span>`;
+                        row += `<span style="color:${this.hiddenColor}">\`</span>`;
                     } else {
                         const tile = this.chunkManager.getTile(mapX, mapY);
                         if (visibility === 'explored') {
@@ -639,6 +636,11 @@ class Game {
                 </div>
             </div>
         `;
+
+        // Scroll info panel to show project details on mobile
+        requestAnimationFrame(() => {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
     }
 }
 

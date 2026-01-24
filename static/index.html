@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dylan Connolly</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=7">
+    <link rel="stylesheet" href="/static/css/style.css?v=8">
 </head>
 <body>
     <div class="container">
@@ -40,11 +40,19 @@
                     <p class="desktop-hint">WASD or Arrow Keys to move | E to inspect</p>
                     <div class="mobile-controls" id="mobile-controls">
                         <div class="dpad">
-                            <button class="dpad-btn dpad-up" data-dir="up" aria-label="Move up">▲</button>
-                            <button class="dpad-btn dpad-left" data-dir="left" aria-label="Move left">◀</button>
+                            <button class="dpad-btn dpad-up" data-dir="up" aria-label="Move up">
+                                <svg viewBox="0 0 24 24"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
+                            </button>
+                            <button class="dpad-btn dpad-left" data-dir="left" aria-label="Move left">
+                                <svg viewBox="0 0 24 24"><path d="M4 12l8-8v5h8v6h-8v5z"/></svg>
+                            </button>
                             <button class="dpad-btn dpad-center" id="inspect-btn" aria-label="Inspect">E</button>
-                            <button class="dpad-btn dpad-right" data-dir="right" aria-label="Move right">▶</button>
-                            <button class="dpad-btn dpad-down" data-dir="down" aria-label="Move down">▼</button>
+                            <button class="dpad-btn dpad-right" data-dir="right" aria-label="Move right">
+                                <svg viewBox="0 0 24 24"><path d="M20 12l-8 8v-5H4v-6h8V4z"/></svg>
+                            </button>
+                            <button class="dpad-btn dpad-down" data-dir="down" aria-label="Move down">
+                                <svg viewBox="0 0 24 24"><path d="M12 20l8-8h-5V4h-6v8H4z"/></svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -64,6 +72,6 @@
         </footer>
     </div>
 
-    <script type="module" src="/static/js/game.js?v=11"></script>
+    <script type="module" src="/static/js/game.js?v=14"></script>
 </body>
 </html>
