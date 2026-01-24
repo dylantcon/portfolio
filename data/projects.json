@@ -3,7 +3,7 @@
     {
       "id": "portfolio",
       "title": "ASCII Adventure Portfolio",
-      "description": "A terminal-style portfolio website with an interactive ASCII adventure game. Explore a Zelda-inspired overworld to discover projects.",
+      "description": "A terminal-style portfolio website with an interactive ASCII adventure. Explore a Dwarf Fortress/Zelda inspired overworld to discover projects!",
       "tech_stack": ["Go", "JavaScript", "NGINX", "Linux"],
       "github_url": "https://github.com/dylantcon/portfolio",
       "live_url": "https://dconn.dev",
