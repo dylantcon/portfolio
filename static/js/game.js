@@ -363,8 +363,8 @@ class Game {
         const charHeight = testSpan.getBoundingClientRect().height;
         document.body.removeChild(testSpan);
 
-        let cols = Math.max(20, Math.min(Math.floor(availableWidth / charWidth), 100));
-        let rows = Math.max(10, Math.min(Math.floor(availableHeight / charHeight), 50));
+        let cols = Math.max(20, Math.floor(availableWidth / charWidth));
+        let rows = Math.max(10, Math.floor(availableHeight / charHeight));
 
         if (cols % 2 === 0) cols--;
         if (rows % 2 === 0) rows--;
