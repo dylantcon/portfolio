@@ -434,3 +434,29 @@ body {
         max-height: 28vh;
     }
 }
+
+/* Projects / subdomains grid */
+.projects { margin: 24px 0 20px; }
+.projects-title {
+    color: var(--accent-color); font-size: 1rem; font-weight: normal;
+    border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;
+}
+.project-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.card {
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px;
+    padding: 20px 12px; background: #111; border: 1px solid var(--border-color);
+    text-decoration: none; color: var(--text-color);
+    transition: border-color .15s ease, transform .15s ease;
+}
+.card:hover { border-color: var(--accent-color); transform: translateY(-2px); }
+.card svg { width: 42px; height: 42px; color: var(--accent-color); }
+.card-name { font-size: .95rem; color: var(--text-color); }
+.card:hover .card-name { color: var(--accent-color); }
+.card-desc { font-size: .72rem; color: var(--muted-color); line-height: 1.35; }
+@media (max-width: 1024px) { .project-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) {
+    .projects { margin: 14px 0; }
+    .card { padding: 16px 10px; }
+    .card svg { width: 36px; height: 36px; }
+}
+@media (max-width: 380px) { .project-grid { gap: 10px; } }
