@@ -44,8 +44,8 @@ class FogOfWar {
         // Rays step half a tile at a time, so a radius of N tiles takes 2N steps
         const steps = this.visionRadius * 2;
         for (let step = 0; step <= steps; step++) {
-            const tileX = Math.trunc(x);
-            const tileY = Math.trunc(y);
+            const tileX = Math.round(x);
+            const tileY = Math.round(y);
             const key = `${tileX},${tileY}`;
 
             // Mark as visible and explored
