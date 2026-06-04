@@ -90,7 +90,7 @@ body {
     border: 1px solid var(--border-color);
     padding: 10px;
     font-size: 14px;
-    line-height: 1.0;
+    line-height: 0.8;
     letter-spacing: 0;
     white-space: pre;
     font-family: 'Lucida Console', 'Consolas', 'Monaco', 'Roboto Mono', monospace;

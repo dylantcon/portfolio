@@ -5,7 +5,7 @@ class FogOfWar {
     constructor() {
         this.explored = new Set();  // "x,y" -> tiles player has seen
         this.visible = new Set();   // Currently visible tiles
-        this.visionRadius = 15;     // How far the player can see
+        this.visionRadius = 8;      // How far the player can see, in tiles
     }
 
     // Check if tile has been explored
@@ -38,12 +38,12 @@ class FogOfWar {
         const dx = Math.cos(angle);
         const dy = Math.sin(angle);
 
-        // Start at tile center - no offset needed with round()
         let x = startX;
         let y = startY;
 
-        for (let dist = 0; dist <= this.visionRadius; dist++) {
-            // Use round() for symmetric handling in all directions
+        // Rays step half a tile at a time, so a radius of N tiles takes 2N steps
+        const steps = this.visionRadius * 2;
+        for (let step = 0; step <= steps; step++) {
             const tileX = Math.round(x);
             const tileY = Math.round(y);
             const key = `${tileX},${tileY}`;
@@ -145,7 +145,7 @@ class ChunkManager {
     }
 
     // Prefetch chunks around a position - when player's LOS can reach the border
-    prefetchAround(worldX, worldY, visionRadius = 15) {
+    prefetchAround(worldX, worldY, visionRadius = 8) {
         const { chunkX, chunkY, localX, localY } = this.worldToChunk(worldX, worldY);
         // Load adjacent chunks when LOS can see into them
         const threshold = visionRadius;
