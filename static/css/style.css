@@ -7,6 +7,11 @@
     --border-color: #3a3a3a;
     --link-color: #6a9fb5;
     --muted-color: #666666;
+    /* Vertical squash factor for ASCII viewport glyphs, in (0.0, 1.0].
+       Computed at runtime by calculateViewportSize() so a grid cell renders
+       square (keeps the line-of-sight circle round). This static value is only
+       a fallback before that JS runs. */
+    --glyph-squash-y: 0.8;
 }
 
 * {
@@ -107,6 +112,10 @@ body {
 .viewport-content {
     /* Preserve whitespace formatting */
     white-space: pre;
+    /* Squash glyphs (and line spacing) vertically. Centered transform-origin
+       keeps the grid anchored to the flex-centered middle of the viewport. */
+    transform: scaleY(var(--glyph-squash-y));
+    transform-origin: center center;
 }
 
 .tile {

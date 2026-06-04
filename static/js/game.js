@@ -355,16 +355,39 @@ class Game {
         const availableWidth = viewportRect.width - paddingX - borderX;
         const availableHeight = viewportRect.height - paddingY - borderY;
 
-        const testSpan = document.createElement('span');
-        testSpan.style.cssText = `font-family:${style.fontFamily};font-size:${style.fontSize};line-height:${style.lineHeight};position:absolute;visibility:hidden;white-space:pre`;
-        testSpan.textContent = 'X';
-        document.body.appendChild(testSpan);
-        const charWidth = testSpan.getBoundingClientRect().width;
-        const charHeight = testSpan.getBoundingClientRect().height;
-        document.body.removeChild(testSpan);
+        // Measure the font cell: horizontal advance per character and vertical
+        // stride per row. Sampling many glyphs/lines averages out sub-pixel
+        // rounding. The stride probe must be a block of real lines because a
+        // single inline span reports its glyph box, not the line-box stride.
+        const fontCSS = `font-family:${style.fontFamily};font-size:${style.fontSize};line-height:${style.lineHeight};white-space:pre;position:absolute;visibility:hidden;left:-9999px;top:0`;
+        const sample = 50;
+
+        const wProbe = document.createElement('span');
+        wProbe.style.cssText = fontCSS;
+        wProbe.textContent = 'X'.repeat(sample);
+        document.body.appendChild(wProbe);
+        const charWidth = wProbe.getBoundingClientRect().width / sample;
+        document.body.removeChild(wProbe);
+
+        const hProbe = document.createElement('div');
+        hProbe.style.cssText = fontCSS;
+        hProbe.textContent = Array(sample).fill('X').join('\n');
+        document.body.appendChild(hProbe);
+        const lineStride = hProbe.getBoundingClientRect().height / sample;
+        document.body.removeChild(hProbe);
+
+        // A monospace cell is taller than it is wide, so a circular line-of-sight
+        // renders as a vertical ellipse. Squash glyphs vertically until the
+        // rendered cell is square (height === width); the LOS then reads round.
+        const squash = Math.max(0.1, Math.min(1, charWidth / lineStride));
+        document.documentElement.style.setProperty('--glyph-squash-y', squash);
+
+        // The squash is purely visual, so size rows against the *rendered* row
+        // height (= charWidth once cells are square) to refill the viewport.
+        const rowHeight = lineStride * squash;
 
         let cols = Math.max(20, Math.floor(availableWidth / charWidth));
-        let rows = Math.max(10, Math.floor(availableHeight / charHeight));
+        let rows = Math.max(10, Math.floor(availableHeight / rowHeight));
 
         if (cols % 2 === 0) cols--;
         if (rows % 2 === 0) rows--;
