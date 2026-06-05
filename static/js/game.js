@@ -315,6 +315,17 @@ class Game {
         this.viewportWidth = 40;
         this.viewportHeight = 20;
 
+        // ASCII display config. The grid fills the available width; the row count
+        // is fixed so the box stays short (keeps the projects in view). The
+        // user-controlled zoom scales the glyph size, so the box height and tile
+        // size scale together. displayRows stays above the LOS diameter
+        // (visionRadius * 2 + 1 = 17) so the sight circle always fits.
+        this.displayRows = 39;
+        this.minScale = 0.6;
+        this.maxScale = 1.6;
+        this.scaleStep = 0.1;
+        this.displayScale = this.loadDisplayScale();
+
         // Key state for smooth movement
         this.keysDown = new Set();
         this.moveInterval = null;
@@ -327,13 +338,17 @@ class Game {
 
     async init() {
         try {
+            // Size the display box up front so it reserves layout space and the
+            // page doesn't shift while the first chunks are fetched.
+            this.applyDisplayScale();
+            this.calculateViewportSize();
+
             // Initialize chunk manager and get spawn position
             this.position = await this.chunkManager.init();
 
             // Prefetch surrounding chunks based on vision radius
             this.chunkManager.prefetchAround(this.position.x, this.position.y, this.fogOfWar.visionRadius);
 
-            this.calculateViewportSize();
             this.render();
             this.setupEventListeners();
             this.updateZoneInfo();
@@ -341,6 +356,37 @@ class Game {
             console.error('Failed to initialize game:', error);
             this.viewport.innerHTML = `<span style="color:#ff4444">Error: ${error.message}</span>`;
         }
+    }
+
+    // --- Display zoom -----------------------------------------------------
+
+    loadDisplayScale() {
+        try {
+            const saved = parseFloat(localStorage.getItem('displayScale'));
+            if (!isNaN(saved)) {
+                return Math.min(this.maxScale, Math.max(this.minScale, saved));
+            }
+        } catch (e) { /* localStorage unavailable (private mode, etc.) */ }
+        return 1;
+    }
+
+    applyDisplayScale() {
+        document.documentElement.style.setProperty('--display-scale', this.displayScale);
+        try {
+            localStorage.setItem('displayScale', String(this.displayScale));
+        } catch (e) { /* ignore persistence failures */ }
+    }
+
+    setDisplayScale(scale) {
+        const clamped = Math.min(
+            this.maxScale,
+            Math.max(this.minScale, Math.round(scale * 10) / 10)
+        );
+        if (clamped === this.displayScale) return;
+        this.displayScale = clamped;
+        this.applyDisplayScale();
+        this.calculateViewportSize();
+        this.render();
     }
 
     calculateViewportSize() {
@@ -352,8 +398,9 @@ class Game {
         const borderX = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
         const borderY = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
 
+        // The box fills its track (CSS), so columns are derived from its own
+        // rendered width. Only the height is set below to keep the box short.
         const availableWidth = viewportRect.width - paddingX - borderX;
-        const availableHeight = viewportRect.height - paddingY - borderY;
 
         // Measure the font cell: horizontal advance per character and vertical
         // stride per row. Sampling many glyphs/lines averages out sub-pixel
@@ -382,21 +429,44 @@ class Game {
         const squash = Math.max(0.1, Math.min(1, charWidth / lineStride));
         document.documentElement.style.setProperty('--glyph-squash-y', squash);
 
-        // The squash is purely visual, so size rows against the *rendered* row
-        // height (= charWidth once cells are square) to refill the viewport.
+        // The squash is purely visual; the rendered row height (= charWidth once
+        // cells are square) is what the box height is sized against.
         const rowHeight = lineStride * squash;
 
-        let cols = Math.max(20, Math.floor(availableWidth / charWidth));
-        let rows = Math.max(10, Math.floor(availableHeight / rowHeight));
+        // Columns fill the width; rows are fixed (min keeps the LOS circle whole
+        // even on narrow screens, where overflow is clipped from the edges).
+        let cols = Math.max(21, Math.floor(availableWidth / charWidth));
+        let rows = this.displayRows;
 
         if (cols % 2 === 0) cols--;
         if (rows % 2 === 0) rows--;
 
         this.viewportWidth = cols;
         this.viewportHeight = rows;
+
+        // Width fills the track (CSS); set only the height so the box stays short
+        // and scales with the zoom, keeping the projects in view.
+        this.viewport.style.height = `${Math.round(rows * rowHeight + paddingY + borderY)}px`;
     }
 
     setupEventListeners() {
+        // Display zoom buttons
+        const zoomOut = document.getElementById('zoom-out');
+        const zoomReset = document.getElementById('zoom-reset');
+        const zoomIn = document.getElementById('zoom-in');
+        if (zoomOut) zoomOut.addEventListener('click', (e) => {
+            this.setDisplayScale(this.displayScale - this.scaleStep);
+            e.currentTarget.blur();
+        });
+        if (zoomReset) zoomReset.addEventListener('click', (e) => {
+            this.setDisplayScale(1);
+            e.currentTarget.blur();
+        });
+        if (zoomIn) zoomIn.addEventListener('click', (e) => {
+            this.setDisplayScale(this.displayScale + this.scaleStep);
+            e.currentTarget.blur();
+        });
+
         document.addEventListener('keydown', (e) => {
             const key = e.key.toLowerCase();
 

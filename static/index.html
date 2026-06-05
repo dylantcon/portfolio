@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dylan Connolly</title>
-    <link rel="stylesheet" href="/static/css/style.css?v=11">
+    <link rel="stylesheet" href="/static/css/style.css?v=13">
     <link rel="icon" type="image/png" href="/static/favicon.png?v=1">
     <!-- favicon is so cute :) -->
 </head>
@@ -34,6 +34,11 @@
 
         <main class="main-content">
             <div class="game-wrapper">
+                <div class="zoom-controls" role="group" aria-label="Display size">
+                    <button type="button" class="zoom-btn" id="zoom-out" aria-label="Decrease display size">&minus;</button>
+                    <button type="button" class="zoom-btn" id="zoom-reset">reset</button>
+                    <button type="button" class="zoom-btn" id="zoom-in" aria-label="Increase display size">+</button>
+                </div>
                 <div id="viewport" class="viewport"></div>
                 <div class="controls">
                     <p class="desktop-hint">WASD or Arrow Keys to move | E to inspect</p>
@@ -114,6 +119,6 @@
         </footer>
     </div>
 
-    <script type="module" src="/static/js/game.js?v=22"></script>
+    <script type="module" src="/static/js/game.js?v=26"></script>
 </body>
 </html>
