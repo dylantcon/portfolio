@@ -272,5 +272,95 @@ func main() {
 		fmt.Printf("  Created %s (%d zones)\n", filename, len(chunk.Zones))
 	}
 
+	// Build the signpost registry: one seam marker per shared border, owned by
+	// the South/East chunk, carrying the hint for both directions of travel.
+	if err := writeSignposts(outputDir); err != nil {
+		fmt.Fprintf(os.Stderr, "  ERROR writing signposts: %v\n", err)
+	}
+
 	fmt.Println("Done!")
+}
+
+// dirName maps a Direction to the travel-direction key used in the registry.
+var dirName = map[generation.Direction]string{
+	generation.North: "north",
+	generation.South: "south",
+	generation.East:  "east",
+	generation.West:  "west",
+}
+
+// writeSignposts derives the global signpost registry from worldConfig and
+// writes it to <outputDir>/signposts.json. Each shared border ("seam") yields
+// exactly one entry, owned by the chunk that holds the South/East connection,
+// pairing that chunk's outbound hint with the neighbor's reciprocal hint.
+func writeSignposts(outputDir string) error {
+	const size = generation.ChunkSize
+
+	configByCoord := make(map[[2]int]*generation.ChunkConfig, len(worldConfig))
+	for i := range worldConfig {
+		c := &worldConfig[i]
+		configByCoord[[2]int{c.ChunkX, c.ChunkY}] = c
+	}
+
+	hintOr := func(s string) string {
+		if s == "" {
+			return "A path leads onward..."
+		}
+		return s
+	}
+
+	registry := generation.SignpostRegistry{}
+	for i := range worldConfig {
+		owner := &worldConfig[i]
+		for _, dir := range owner.Connections {
+			var local [2]int
+			var axis string
+			var partition int
+			switch dir {
+			case generation.South:
+				local = [2]int{size / 2, size - 1} // (25, 49)
+				axis = "horizontal"
+				partition = (owner.ChunkY + 1) * size
+			case generation.East:
+				local = [2]int{size - 1, size / 2} // (49, 25)
+				axis = "vertical"
+				partition = (owner.ChunkX + 1) * size
+			default:
+				continue // North/West seams are owned by the neighbor
+			}
+
+			ndx, ndy := dir.Delta()
+			neighborCoord := [2]int{owner.ChunkX + ndx, owner.ChunkY + ndy}
+			neighbor, ok := configByCoord[neighborCoord]
+			if !ok {
+				fmt.Fprintf(os.Stderr, "  WARNING: chunk (%d,%d) connects %s but no neighbor at (%d,%d); skipping seam marker\n",
+					owner.ChunkX, owner.ChunkY, dirName[dir], neighborCoord[0], neighborCoord[1])
+				continue
+			}
+
+			rev := dir.Opposite()
+			registry.Signposts = append(registry.Signposts, generation.SignpostEntry{
+				Chunk:     [2]int{owner.ChunkX, owner.ChunkY},
+				Local:     local,
+				World:     [2]int{owner.ChunkX*size + local[0], owner.ChunkY*size + local[1]},
+				Axis:      axis,
+				Partition: partition,
+				Hints: map[string]string{
+					dirName[dir]: hintOr(owner.SignpostHints[dir]),
+					dirName[rev]: hintOr(neighbor.SignpostHints[rev]),
+				},
+			})
+		}
+	}
+
+	data, err := json.MarshalIndent(registry, "", "  ")
+	if err != nil {
+		return fmt.Errorf("marshaling registry: %w", err)
+	}
+	path := filepath.Join(outputDir, "signposts.json")
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", path, err)
+	}
+	fmt.Printf("Wrote signposts.json (%d seam markers)\n", len(registry.Signposts))
+	return nil
 }

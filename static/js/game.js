@@ -92,6 +92,10 @@ class ChunkManager {
         this.world = await this.api.getWorld();
         this.chunkSize = this.world.chunk_size;
 
+        // Seam markers: one signpost per chunk border, carrying the hint for
+        // both directions of travel. Guard for older servers without the field.
+        this.signposts = this.world.signposts || [];
+
         // Load spawn chunk immediately
         const [sx, sy] = this.world.spawn_chunk;
         await this.loadChunk(sx, sy);
@@ -254,6 +258,24 @@ class ChunkManager {
         return null;
     }
 
+    // Get the seam signpost whose matrix band contains this world point, or
+    // null. The band straddles the chunk border: for a vertical (E/W) boundary
+    // it is 4 wide x 5 tall around the partition; for a horizontal (N/S)
+    // boundary, 5 wide x 4 tall. The owner-side half sits at partition-2..-1.
+    getSeamAt(worldX, worldY) {
+        for (const s of this.signposts || []) {
+            const [mx, my] = s.world;
+            if (s.axis === 'vertical') {
+                const dx = worldX - s.partition;
+                if (dx >= -2 && dx <= 1 && Math.abs(worldY - my) <= 2) return s;
+            } else {
+                const dy = worldY - s.partition;
+                if (dy >= -2 && dy <= 1 && Math.abs(worldX - mx) <= 2) return s;
+            }
+        }
+        return null;
+    }
+
     // Get current tile type name
     getTileType(worldX, worldY) {
         const { chunkX, chunkY, localX, localY } = this.worldToChunk(worldX, worldY);
@@ -330,6 +352,10 @@ class Game {
         this.keysDown = new Set();
         this.moveInterval = null;
         this.moveDelay = 120;
+
+        // Last successful travel direction ('north'|'south'|'east'|'west'),
+        // used to pick which side of a seam signpost to read.
+        this.lastDir = null;
 
         // Fog of war colors
         this.hiddenColor = '#1a1a1a';
@@ -592,15 +618,17 @@ class Game {
         let newX = this.position.x;
         let newY = this.position.y;
 
+        let dir = null;
         switch (key) {
-            case 'w': case 'arrowup': newY--; break;
-            case 's': case 'arrowdown': newY++; break;
-            case 'a': case 'arrowleft': newX--; break;
-            case 'd': case 'arrowright': newX++; break;
+            case 'w': case 'arrowup': newY--; dir = 'north'; break;
+            case 's': case 'arrowdown': newY++; dir = 'south'; break;
+            case 'a': case 'arrowleft': newX--; dir = 'west'; break;
+            case 'd': case 'arrowright': newX++; dir = 'east'; break;
             default: return;
         }
 
         if (this.chunkManager.isWalkable(newX, newY)) {
+            this.lastDir = dir;
             this.position.x = newX;
             this.position.y = newY;
 
@@ -688,7 +716,16 @@ class Game {
             <p class="tile-directions">N:${northType} S:${southType} E:${eastType} W:${westType}</p>`;
 
         if (!zone) {
-            zoneInfoEl.innerHTML = tileInfo + '<p class="hint">Explore the map to discover projects...</p>';
+            const seam = this.chunkManager.getSeamAt(this.position.x, this.position.y);
+            if (seam) {
+                zoneInfoEl.innerHTML = `
+                    ${tileInfo}
+                    <p class="zone-name">Signpost</p>
+                    <p class="zone-description">${this.seamHint(seam)}</p>
+                `;
+            } else {
+                zoneInfoEl.innerHTML = tileInfo + '<p class="hint">Explore the map to discover projects...</p>';
+            }
             document.getElementById('project-info').innerHTML = '';
             return;
         }
@@ -699,6 +736,21 @@ class Game {
             <p class="zone-description">${zone.description}</p>
             ${zone.project_id ? '<p class="hint">Press E to inspect</p>' : ''}
         `;
+    }
+
+    // Choose the seam signpost's hint for the way the player is heading. A
+    // vertical (E/W) boundary reads east/west; a horizontal (N/S) boundary
+    // reads north/south. Off-axis or no prior move falls back to a neutral line.
+    seamHint(seam) {
+        const hints = seam.hints || {};
+        let key = null;
+        if (seam.axis === 'vertical') {
+            if (this.lastDir === 'east' || this.lastDir === 'west') key = this.lastDir;
+        } else {
+            if (this.lastDir === 'north' || this.lastDir === 'south') key = this.lastDir;
+        }
+        if (key && hints[key]) return hints[key];
+        return 'A signpost stands at the crossing — which way will you go?';
     }
 
     async handleInspect() {

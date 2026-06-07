@@ -369,32 +369,24 @@ func (cg *ChunkGenerator) placeHub() {
 }
 
 func (cg *ChunkGenerator) placeSignposts() {
-	// Add signposts ON the path near edge connections
+	// Place a single seam marker per shared border, owned by the South/East
+	// chunk so each reciprocated border gets exactly one marker. The marker
+	// sits on the edge port tile (on the path, right at the border). The
+	// directional hint text lives in the global signpost registry built by
+	// cmd/generate, so no zone is emitted here.
+	mid := ChunkSize / 2
 	for _, dir := range cg.config.Connections {
-		hint := cg.config.SignpostHints[dir]
-		if hint == "" {
-			hint = "A path leads onward..."
-		}
-
-		// Position signpost ON the path, a few tiles in from edge
 		var pos Point
-		offset := 4
-		mid := ChunkSize / 2
-
 		switch dir {
-		case North:
-			pos = Point{mid, offset} // On the north path
 		case South:
-			pos = Point{mid, ChunkSize - 1 - offset} // On the south path
+			pos = Point{mid, ChunkSize - 1} // (25, 49)
 		case East:
-			pos = Point{ChunkSize - 1 - offset, mid} // On the east path
-		case West:
-			pos = Point{offset, mid} // On the west path
+			pos = Point{ChunkSize - 1, mid} // (49, 25)
+		default:
+			continue // North/West seams are owned by the neighbor
 		}
 
-		signpost := NewSignpost(pos, dir, "", hint)
-		cg.components = append(cg.components, signpost)
-		cg.zones = append(cg.zones, signpost.GetZone())
+		cg.components = append(cg.components, NewSeamMarker(pos))
 	}
 }
 

@@ -36,6 +36,23 @@ type WorldResponse struct {
 	SpawnLocal      [2]int            `json:"spawn_local"`
 	TileDefinitions map[string]Tile   `json:"tile_definitions"`
 	AvailableChunks map[string]string `json:"available_chunks"` // "x,y" -> name
+	Signposts       []Signpost        `json:"signposts"`        // seam markers with directional hints
+}
+
+// Signpost is a single seam marker shared between two chunks, carrying the
+// hint for both directions of travel across the border.
+type Signpost struct {
+	Chunk     [2]int            `json:"chunk"`
+	Local     [2]int            `json:"local"`
+	World     [2]int            `json:"world"`
+	Axis      string            `json:"axis"`      // "horizontal" (N/S seam) | "vertical" (E/W seam)
+	Partition int               `json:"partition"` // world coord of the border line
+	Hints     map[string]string `json:"hints"`     // travel direction -> hint
+}
+
+// SignpostFile matches the data/signposts.json format written by cmd/generate.
+type SignpostFile struct {
+	Signposts []Signpost `json:"signposts"`
 }
 
 // GameMap represents the entire game world (legacy, kept for compatibility)

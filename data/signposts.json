@@ -1,0 +1,184 @@
+{
+  "signposts": [
+    {
+      "chunk": [
+        0,
+        0
+      ],
+      "local": [
+        25,
+        49
+      ],
+      "world": [
+        25,
+        49
+      ],
+      "axis": "horizontal",
+      "partition": 50,
+      "hints": {
+        "north": "The peaceful starting isle awaits.",
+        "south": "Castle spires glimmer in the distance."
+      }
+    },
+    {
+      "chunk": [
+        0,
+        0
+      ],
+      "local": [
+        49,
+        25
+      ],
+      "world": [
+        49,
+        25
+      ],
+      "axis": "vertical",
+      "partition": 50,
+      "hints": {
+        "east": "The smell of salt and sea beckons.",
+        "west": "Return to the peaceful starting meadows."
+      }
+    },
+    {
+      "chunk": [
+        0,
+        -1
+      ],
+      "local": [
+        25,
+        49
+      ],
+      "world": [
+        25,
+        -1
+      ],
+      "axis": "horizontal",
+      "partition": 0,
+      "hints": {
+        "north": "Clockwork echoes drift from the north. The machines await.",
+        "south": "The peaceful starting meadows lie beyond."
+      }
+    },
+    {
+      "chunk": [
+        -1,
+        -1
+      ],
+      "local": [
+        25,
+        49
+      ],
+      "world": [
+        -25,
+        -1
+      ],
+      "axis": "horizontal",
+      "partition": 0,
+      "hints": {
+        "north": "The mountains hold secrets of transformation.",
+        "south": "The forest whispers of tools and crafts below."
+      }
+    },
+    {
+      "chunk": [
+        -1,
+        0
+      ],
+      "local": [
+        25,
+        49
+      ],
+      "world": [
+        -25,
+        49
+      ],
+      "axis": "horizontal",
+      "partition": 50,
+      "hints": {
+        "north": "Deep woods hide workshops of craft.",
+        "south": "Scholars gather where knowledge flows freely."
+      }
+    },
+    {
+      "chunk": [
+        -1,
+        0
+      ],
+      "local": [
+        49,
+        25
+      ],
+      "world": [
+        -1,
+        25
+      ],
+      "axis": "vertical",
+      "partition": 0,
+      "hints": {
+        "east": "The central isle lies just beyond.",
+        "west": "Shadows dance between ancient trees, and mountains loom beyond."
+      }
+    },
+    {
+      "chunk": [
+        1,
+        0
+      ],
+      "local": [
+        25,
+        49
+      ],
+      "world": [
+        75,
+        49
+      ],
+      "axis": "horizontal",
+      "partition": 50,
+      "hints": {
+        "north": "Salty breezes drift from the harbor.",
+        "south": "Towers of healing rise to the south."
+      }
+    },
+    {
+      "chunk": [
+        -1,
+        1
+      ],
+      "local": [
+        49,
+        25
+      ],
+      "world": [
+        -1,
+        75
+      ],
+      "axis": "vertical",
+      "partition": 0,
+      "hints": {
+        "east": "Games and glory await at the castle!",
+        "west": "Seekers of knowledge head this way."
+      }
+    },
+    {
+      "chunk": [
+        0,
+        1
+      ],
+      "local": [
+        49,
+        25
+      ],
+      "world": [
+        49,
+        75
+      ],
+      "axis": "vertical",
+      "partition": 50,
+      "hints": {
+        "east": "Healers tend to the tower beyond.",
+        "west": "The castle's games echo across the land."
+      }
+    }
+  ]
+}

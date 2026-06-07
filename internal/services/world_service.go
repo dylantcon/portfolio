@@ -11,9 +11,10 @@ import (
 
 // WorldService manages the chunk-based world
 type WorldService struct {
-	world    *models.World
-	dataPath string
-	chunks   map[string]*models.Chunk // cached chunks
+	world     *models.World
+	dataPath  string
+	chunks    map[string]*models.Chunk // cached chunks
+	signposts []models.Signpost        // seam markers with directional hints
 }
 
 // NewWorldService creates a new WorldService
@@ -26,6 +27,8 @@ func NewWorldService(dataPath string) (*WorldService, error) {
 	if err := ws.loadWorld(); err != nil {
 		return nil, err
 	}
+
+	ws.loadSignposts()
 
 	return ws, nil
 }
@@ -46,6 +49,23 @@ func (ws *WorldService) loadWorld() error {
 	return nil
 }
 
+// loadSignposts loads the seam-marker registry. A missing file is non-fatal:
+// the server still serves the world with an empty signpost list (e.g. before
+// the first `make generate`).
+func (ws *WorldService) loadSignposts() {
+	path := filepath.Join(ws.dataPath, "signposts.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return
+	}
+
+	var file models.SignpostFile
+	if err := json.Unmarshal(data, &file); err != nil {
+		return
+	}
+	ws.signposts = file.Signposts
+}
+
 // GetWorldResponse returns the world manifest for the client
 func (ws *WorldService) GetWorldResponse() *models.WorldResponse {
 	available := make(map[string]string)
@@ -59,6 +79,7 @@ func (ws *WorldService) GetWorldResponse() *models.WorldResponse {
 		SpawnLocal:      ws.world.SpawnLocal,
 		TileDefinitions: ws.world.TileDefinitions,
 		AvailableChunks: available,
+		Signposts:       ws.signposts,
 	}
 }
 

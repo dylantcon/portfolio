@@ -767,35 +767,28 @@ func (b *Border) GetBounds() Bounds    { return b.inner.Expand(1) }
 func (b *Border) GetAnchors() []Anchor { return nil }
 func (b *Border) GetZone() *Zone       { return nil }
 
-// Signpost marks a path exit with destination info
-type Signpost struct {
-	position  Point
-	direction Direction
-	zone      *Zone
+// SeamMarker stamps a single walkable marker tile on the path at a chunk
+// border. Its directional hints live in the global signpost registry, so the
+// component itself carries no zone.
+type SeamMarker struct {
+	position Point
 }
 
-func NewSignpost(position Point, direction Direction, destName, destHint string) *Signpost {
-	return &Signpost{
-		position:  position,
-		direction: direction,
-		zone: &Zone{
-			Name:        "Signpost",
-			Description: destHint,
-			Bounds:      Bounds{position.X - 1, position.Y - 1, position.X + 1, position.Y + 1},
-		},
-	}
+func NewSeamMarker(position Point) *SeamMarker {
+	return &SeamMarker{position: position}
 }
 
-func (s *Signpost) Render(g *Grid, p *Palette) {
-	// Place marker at signpost position
+func (s *SeamMarker) Render(g *Grid, p *Palette) {
+	// Walkable so path routing threads through it; placed before routePaths
+	// (which only overwrites grass/sand), so the marker survives.
 	g.Set(s.position, p.Marker, true)
 }
 
-func (s *Signpost) GetBounds() Bounds {
+func (s *SeamMarker) GetBounds() Bounds {
 	return Bounds{s.position.X, s.position.Y, s.position.X, s.position.Y}
 }
-func (s *Signpost) GetAnchors() []Anchor { return nil }
-func (s *Signpost) GetZone() *Zone       { return s.zone }
+func (s *SeamMarker) GetAnchors() []Anchor { return nil }
+func (s *SeamMarker) GetZone() *Zone       { return nil }
 
 // Pond creates a small water feature
 type Pond struct {

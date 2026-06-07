@@ -240,3 +240,21 @@ type BoundsDef struct {
 	MinY int `json:"min_y"`
 	MaxY int `json:"max_y"`
 }
+
+// SignpostEntry describes a single seam marker shared between two chunks.
+// Each seam has exactly one marker tile (owned by the South/East chunk) but
+// carries the hint for both directions of travel across the border.
+type SignpostEntry struct {
+	Chunk     [2]int            `json:"chunk"`     // owning chunk (the S/E owner)
+	Local     [2]int            `json:"local"`     // marker tile, chunk-local coords
+	World     [2]int            `json:"world"`     // marker tile, world coords (visual + index key)
+	Axis      string            `json:"axis"`      // "horizontal" (N/S seam) | "vertical" (E/W seam)
+	Partition int               `json:"partition"` // world coord of the border line (y for horizontal, x for vertical)
+	Hints     map[string]string `json:"hints"`     // direction-of-travel -> hint ("north"/"south" or "east"/"west")
+}
+
+// SignpostRegistry is the global list of every seam marker, written to
+// data/signposts.json and shipped to the client with the world manifest.
+type SignpostRegistry struct {
+	Signposts []SignpostEntry `json:"signposts"`
+}
