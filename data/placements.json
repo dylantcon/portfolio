@@ -10,9 +10,9 @@
     },
     {
       "project_id": "chiptune-synth",
-      "chunk": [0, 0],
-      "name": "The Bard's Hollow",
-      "description": "Square waves and triangle tones drift across the meadow. An eight-bit songbird nests here, chirping in perfect 60Hz time.",
+      "chunk": [1, 1],
+      "name": "The Chiptune Conservatory",
+      "description": "Square waves and triangle tones spill from every window. Within, an eight-bit songbird performs in perfect 60Hz time.",
       "structure": "cabin",
       "size": 1
     },

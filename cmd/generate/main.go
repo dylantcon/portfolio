@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
-  "math/rand/v2"
+	"strings"
+
 	"dconn.dev/internal/generation"
 )
 
@@ -137,7 +139,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Generate chunks
+	// Generate chunks. Track failures so a partial regeneration exits non-zero
+	// rather than silently leaving stale chunk files on disk (and, via the
+	// Makefile, restarting the service with mismatched data).
+	var failures []string
 	for _, config := range worldConfig {
 		fmt.Printf("Generating chunk (%d, %d) - %s biome...\n", config.ChunkX, config.ChunkY, config.Biome)
 
@@ -145,6 +150,7 @@ func main() {
 		chunk, err := gen.Generate()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "  ERROR: %v\n", err)
+			failures = append(failures, fmt.Sprintf("(%d, %d): %v", config.ChunkX, config.ChunkY, err))
 			continue
 		}
 
@@ -155,11 +161,13 @@ func main() {
 		data, err := json.MarshalIndent(chunk, "", "  ")
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "  ERROR marshaling JSON: %v\n", err)
+			failures = append(failures, fmt.Sprintf("(%d, %d): %v", config.ChunkX, config.ChunkY, err))
 			continue
 		}
 
 		if err := os.WriteFile(path, data, 0644); err != nil {
 			fmt.Fprintf(os.Stderr, "  ERROR writing file: %v\n", err)
+			failures = append(failures, fmt.Sprintf("(%d, %d): %v", config.ChunkX, config.ChunkY, err))
 			continue
 		}
 
@@ -170,6 +178,13 @@ func main() {
 	// the South/East chunk, carrying the hint for both directions of travel.
 	if err := writeSignposts(outputDir); err != nil {
 		fmt.Fprintf(os.Stderr, "  ERROR writing signposts: %v\n", err)
+		failures = append(failures, fmt.Sprintf("signposts: %v", err))
+	}
+
+	if len(failures) > 0 {
+		fmt.Fprintf(os.Stderr, "\nFAILED: %d chunk(s) not regenerated (existing files left unchanged):\n  - %s\n",
+			len(failures), strings.Join(failures, "\n  - "))
+		os.Exit(1)
 	}
 
 	fmt.Println("Done!")
