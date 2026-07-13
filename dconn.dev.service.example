@@ -14,6 +14,9 @@ RestartSec=5s
 # Environment
 Environment="GO_ENV=production"
 Environment="SERVER_ADDR=:8080"
+# Secrets (Spotify credentials, etc.) live in a gitignored .env file.
+# The leading "-" makes systemd tolerate the file being absent.
+EnvironmentFile=-/var/www/dconn.dev/.env
 
 # Logging
 StandardOutput=append:/var/www/dconn.dev/logs/app.log

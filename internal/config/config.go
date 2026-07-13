@@ -9,11 +9,25 @@ import (
 
 // Config holds all application configuration
 type Config struct {
-	ServerAddr   string
-	DataPath     string
-	GameMap      *models.GameMap
-	Projects     *models.ProjectList
-	GameConfig   *GameConfig
+	ServerAddr string
+	DataPath   string
+	GameMap    *models.GameMap
+	Projects   *models.ProjectList
+	GameConfig *GameConfig
+	Spotify    SpotifyConfig
+}
+
+// SpotifyConfig holds the credentials for the "now playing" badge. All three are
+// read from the environment (or .env). If any is empty, the feature is disabled.
+type SpotifyConfig struct {
+	ClientID     string
+	ClientSecret string
+	RefreshToken string
+}
+
+// Enabled reports whether all Spotify credentials are present.
+func (s SpotifyConfig) Enabled() bool {
+	return s.ClientID != "" && s.ClientSecret != "" && s.RefreshToken != ""
 }
 
 // GameConfig holds game-specific settings
@@ -35,6 +49,9 @@ type Theme struct {
 
 // Load reads and parses all configuration files
 func Load() *Config {
+	// Load .env (if present) before reading any environment variables.
+	LoadDotEnv(".env")
+
 	gameMap := loadGameMap()
 	projects := loadProjects()
 	gameConfig := loadGameConfig()
@@ -50,6 +67,11 @@ func Load() *Config {
 		GameMap:    gameMap,
 		Projects:   projects,
 		GameConfig: gameConfig,
+		Spotify: SpotifyConfig{
+			ClientID:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		},
 	}
 }
 
