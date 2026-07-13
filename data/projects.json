@@ -81,11 +81,11 @@
       "featured": true
     },
     {
-      "id": "presentation-choreographer",
-      "title": "Presentation Choreographer",
-      "description": "Programmatic creation and manipulation of PowerPoint files. Powered by Java and the Anthropic API.",
-      "tech_stack": ["Java", "Anthropic API"],
-      "github_url": "https://github.com/dylantcon/presentation-choreographer",
+      "id": "excudo",
+      "title": "Excudo",
+      "description": "Comprehensive PPTX toolchain with CLI and GUI interfaces, supporting agentic slide deck creation via OpenRouter.",
+      "tech_stack": ["Java", "OpenRouter"],
+      "github_url": "https://github.com/dylantcon/excudo",
       "live_url": "",
       "year": 2025,
       "featured": true
@@ -139,6 +139,46 @@
       "live_url": "",
       "year": 2026,
       "featured": false
+    },
+    {
+      "id": "javalab",
+      "title": "JavaLab",
+      "description": "Emulate Java 17 entirely in the browser, with no downloads required. Write, compile, and run Java code on the web.",
+      "tech_stack": ["JavaScript", "Java", "HTML", "CSS"],
+      "github_url": "https://github.com/dylantcon/javalab",
+      "live_url": "",
+      "year": 2026,
+      "featured": true
+    },
+    {
+      "id": "vault-site",
+      "title": "Vault Site",
+      "description": "Hugo pipeline that publishes my Obsidian vault to the web as a browsable knowledge base.",
+      "tech_stack": ["Hugo", "Obsidian", "Python", "Shell", "CSS"],
+      "github_url": "https://github.com/dylantcon/vault-site",
+      "live_url": "https://vault.dconn.dev",
+      "year": 2026,
+      "featured": true
+    },
+    {
+      "id": "chiptune-synth",
+      "title": "Chiptune Synth",
+      "description": "NES 2A03-style chiptune synthesizer for Java. Features pulse/triangle/noise channels, percussion voices, and a 60 Hz frame sequencer over javax.sound.sampled.",
+      "tech_stack": ["Java"],
+      "github_url": "https://github.com/dylantcon/chiptune-synth",
+      "live_url": "",
+      "year": 2026,
+      "featured": true
+    },
+    {
+      "id": "dgmt",
+      "title": "DGMT",
+      "description": "Dylan's General Management Tool: a hub-and-spoke sync orchestrator supporting multiple backends (Syncthing, SFTP, rclone) with file-watching, debounced bidirectional sync, and daemon operation.",
+      "tech_stack": ["Python", "Syncthing", "SFTP", "rclone"],
+      "github_url": "https://github.com/dylantcon/dgmt",
+      "live_url": "",
+      "year": 2026,
+      "featured": true
     }
   ]
 }

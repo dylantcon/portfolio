@@ -26,15 +26,6 @@ var worldConfig = []generation.ChunkConfig{
 			generation.East:  "The smell of salt and sea beckons.",
 			generation.West:  "Shadows dance between ancient trees, and mountains loom beyond.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "portfolio",
-				Name:        "Portfolio Shrine",
-				Description: "A mystical monument that seems to reflect your very presence. How... recursive.",
-				Structure:   "shrine",
-				Size:        2,
-			},
-		},
 	},
 	{
 		ChunkX:      0,
@@ -46,22 +37,6 @@ var worldConfig = []generation.ChunkConfig{
 		SignpostHints: map[generation.Direction]string{
 			generation.South: "The peaceful starting meadows lie beyond.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "sysconf",
-				Name:        "The Automaton Forge",
-				Description: "Gears turn in perfect synchrony, each cog knowing its place. The machines here tend to themselves, an endless dance of configuration.",
-				Structure:   "building",
-				Size:        2,
-			},
-			{
-				ProjectID:   "dev-resume",
-				Name:        "The Creator's Archive",
-				Description: "The townspeople whisper that the creator himself once resided here. Within these walls, his deeds and knowledge are preserved for eternity.",
-				Structure:   "archive",
-				Size:        2,
-			},
-		},
 	},
 	{
 		ChunkX:      -1,
@@ -72,22 +47,6 @@ var worldConfig = []generation.ChunkConfig{
 		Connections: []generation.Direction{generation.South},
 		SignpostHints: map[generation.Direction]string{
 			generation.South: "The forest whispers of tools and crafts below.",
-		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "compiler-project",
-				Name:        "The Compiler Forge",
-				Description: "Ancient runes are carved into the walls. They speak of transformations... of text becoming power.",
-				Structure:   "tower",
-				Size:        2,
-			},
-			{
-				ProjectID:   "arithmetic-rdp",
-				Name:        "Parser's Cabin",
-				Description: "A humble dwelling where symbols are weighed and balanced. The chimney smoke forms strange equations.",
-				Structure:   "cabin",
-				Size:        1,
-			},
 		},
 	},
 	{
@@ -102,22 +61,6 @@ var worldConfig = []generation.ChunkConfig{
 			generation.South: "Scholars gather where knowledge flows freely.",
 			generation.East:  "The central isle lies just beyond.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "pydis",
-				Name:        "The Disassembly Workshop",
-				Description: "Gears and mechanisms lie exposed. Here, the inner workings of serpentine magic are revealed.",
-				Structure:   "building",
-				Size:        2,
-			},
-			{
-				ProjectID:   "presentation-choreographer",
-				Name:        "The Presentation Stage",
-				Description: "Slides materialize from thin air, arranged by an unseen conductor. The show must go on!",
-				Structure:   "building",
-				Size:        1,
-			},
-		},
 	},
 	{
 		ChunkX:      1,
@@ -130,15 +73,6 @@ var worldConfig = []generation.ChunkConfig{
 			generation.West:  "Return to the peaceful starting meadows.",
 			generation.South: "Towers of healing rise to the south.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "countertrak",
-				Name:        "The Statistics Bureau",
-				Description: "Numbers float through the air like fireflies. Every action counted, every moment measured.",
-				Structure:   "building",
-				Size:        2,
-			},
-		},
 	},
 	{
 		ChunkX:      -1,
@@ -150,15 +84,6 @@ var worldConfig = []generation.ChunkConfig{
 		SignpostHints: map[generation.Direction]string{
 			generation.North: "Deep woods hide workshops of craft.",
 			generation.East:  "Games and glory await at the castle!",
-		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "learn-dconn-dev",
-				Name:        "The Academy",
-				Description: "Young minds gather here, eyes bright with curiosity. The chalkboard never stays clean for long.",
-				Structure:   "courtyard",
-				Size:        3,
-			},
 		},
 	},
 	{
@@ -173,36 +98,6 @@ var worldConfig = []generation.ChunkConfig{
 			generation.West:  "Seekers of knowledge head this way.",
 			generation.East:  "Healers tend to the tower beyond.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "javarominoes",
-				Name:        "Block Tower",
-				Description: "Colorful shapes fall from the heavens, demanding order. A tribute to grandfathers everywhere.",
-				Structure:   "tower",
-				Size:        2,
-			},
-			{
-				ProjectID:   "seas-of-yore",
-				Name:        "Naval Quarters",
-				Description: "Model ships line the shelves. Somewhere, cannons thunder across imaginary waters.",
-				Structure:   "building",
-				Size:        2,
-			},
-			{
-				ProjectID:   "draw-shapes",
-				Name:        "The Art Studio",
-				Description: "Brushes hover in mid-air, leaving trails of color. Creation needs no hands here.",
-				Structure:   "cabin",
-				Size:        1,
-			},
-			{
-				ProjectID:   "site-selector",
-				Name:        "Navigator's Hut",
-				Description: "Maps upon maps, portals to distant realms. The world wide web of roads converges here.",
-				Structure:   "cabin",
-				Size:        1,
-			},
-		},
 	},
 	{
 		ChunkX:      1,
@@ -215,15 +110,6 @@ var worldConfig = []generation.ChunkConfig{
 			generation.North: "Salty breezes drift from the harbor.",
 			generation.West:  "The castle's games echo across the land.",
 		},
-		Projects: []generation.ProjectPlacement{
-			{
-				ProjectID:   "clinicore",
-				Name:        "The Medical Tower",
-				Description: "White walls gleam with purpose. Within, the chronicles of health are written in meticulous detail.",
-				Structure:   "tower",
-				Size:        3,
-			},
-		},
 	},
 }
 
@@ -235,6 +121,14 @@ func main() {
 	}
 
 	outputDir := os.Args[1]
+
+	// Populate each chunk's project placements from data/placements.json,
+	// validating against data/projects.json so the map can't drift from the
+	// project list.
+	if err := applyPlacements(worldConfig, outputDir); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
+	}
 
 	// Ensure output directory exists
 	chunksDir := filepath.Join(outputDir, "chunks")

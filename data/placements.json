@@ -1,0 +1,148 @@
+{
+  "placements": [
+    {
+      "project_id": "portfolio",
+      "chunk": [0, 0],
+      "name": "Portfolio Shrine",
+      "description": "A mystical monument that seems to reflect your very presence. How... recursive.",
+      "structure": "shrine",
+      "size": 2
+    },
+    {
+      "project_id": "chiptune-synth",
+      "chunk": [0, 0],
+      "name": "The Bard's Hollow",
+      "description": "Square waves and triangle tones drift across the meadow. An eight-bit songbird nests here, chirping in perfect 60Hz time.",
+      "structure": "cabin",
+      "size": 1
+    },
+    {
+      "project_id": "sysconf",
+      "chunk": [0, -1],
+      "name": "The Automaton Forge",
+      "description": "Gears turn in perfect synchrony, each cog knowing its place. The machines here tend to themselves, an endless dance of configuration.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "dev-resume",
+      "chunk": [0, -1],
+      "name": "The Creator's Archive",
+      "description": "The townspeople whisper that the creator himself once resided here. Within these walls, his deeds and knowledge are preserved for eternity.",
+      "structure": "archive",
+      "size": 2
+    },
+    {
+      "project_id": "compiler-project",
+      "chunk": [-1, -1],
+      "name": "The Compiler Forge",
+      "description": "Ancient runes are carved into the walls. They speak of transformations... of text becoming power.",
+      "structure": "tower",
+      "size": 2
+    },
+    {
+      "project_id": "arithmetic-rdp",
+      "chunk": [-1, -1],
+      "name": "Parser's Cabin",
+      "description": "A humble dwelling where symbols are weighed and balanced. The chimney smoke forms strange equations.",
+      "structure": "cabin",
+      "size": 1
+    },
+    {
+      "project_id": "pydis",
+      "chunk": [-1, 0],
+      "name": "The Disassembly Workshop",
+      "description": "Gears and mechanisms lie exposed. Here, the inner workings of serpentine magic are revealed.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "excudo",
+      "chunk": [-1, 0],
+      "name": "The Presentation Stage",
+      "description": "Slides materialize from thin air, arranged by an unseen conductor. The show must go on!",
+      "structure": "building",
+      "size": 1
+    },
+    {
+      "project_id": "vault-site",
+      "chunk": [-1, 0],
+      "name": "The Vault Library",
+      "description": "Endless shelves of interlinked tomes, each note a thread to a dozen others. Scholars swear the library rearranges itself to reveal what you seek.",
+      "structure": "archive",
+      "size": 2
+    },
+    {
+      "project_id": "countertrak",
+      "chunk": [1, 0],
+      "name": "The Statistics Bureau",
+      "description": "Numbers float through the air like fireflies. Every action counted, every moment measured.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "dgmt",
+      "chunk": [1, 0],
+      "name": "The Harbormaster's Office",
+      "description": "Ledgers track every vessel in the fleet, each cargo mirrored across distant ports. Nothing leaves the harbor out of sync.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "learn-dconn-dev",
+      "chunk": [-1, 1],
+      "name": "The Academy",
+      "description": "Young minds gather here, eyes bright with curiosity. The chalkboard never stays clean for long.",
+      "structure": "courtyard",
+      "size": 3
+    },
+    {
+      "project_id": "javalab",
+      "chunk": [-1, 1],
+      "name": "The Conjuring Classroom",
+      "description": "Students summon a fully-formed Java golem from empty air, no scrolls to fetch nor downloads to await. The lesson begins at once.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "javarominoes",
+      "chunk": [0, 1],
+      "name": "Block Tower",
+      "description": "Colorful shapes fall from the heavens, demanding order. A tribute to grandfathers everywhere.",
+      "structure": "tower",
+      "size": 2
+    },
+    {
+      "project_id": "seas-of-yore",
+      "chunk": [0, 1],
+      "name": "Naval Quarters",
+      "description": "Model ships line the shelves. Somewhere, cannons thunder across imaginary waters.",
+      "structure": "building",
+      "size": 2
+    },
+    {
+      "project_id": "draw-shapes",
+      "chunk": [0, 1],
+      "name": "The Art Studio",
+      "description": "Brushes hover in mid-air, leaving trails of color. Creation needs no hands here.",
+      "structure": "cabin",
+      "size": 1
+    },
+    {
+      "project_id": "site-selector",
+      "chunk": [0, 1],
+      "name": "Navigator's Hut",
+      "description": "Maps upon maps, portals to distant realms. The world wide web of roads converges here.",
+      "structure": "cabin",
+      "size": 1
+    },
+    {
+      "project_id": "clinicore",
+      "chunk": [1, 1],
+      "name": "The Medical Tower",
+      "description": "White walls gleam with purpose. Within, the chronicles of health are written in meticulous detail.",
+      "structure": "tower",
+      "size": 3
+    }
+  ]
+}
